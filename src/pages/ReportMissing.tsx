@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,77 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { Heart, ArrowLeft, AlertTriangle, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ReportMissing = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    dob: '',
+    category: '',
+    lastKnownLocation: '',
+    contactName: '',
+    contactPhone: '',
+    contactEmail: '',
+    description: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const contactInfo = `Name: ${formData.contactName}, Phone: ${formData.contactPhone}, Email: ${formData.contactEmail}`;
+      
+      const { error } = await supabase
+        .from('missing_persons')
+        .insert([
+          {
+            name: formData.name,
+            dob: formData.dob || null,
+            category: formData.category,
+            last_known_location: formData.lastKnownLocation,
+            contact_info: contactInfo,
+            description: formData.description
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Report submitted successfully!",
+        description: "Thank you for reporting. We will do our best to help locate the missing person."
+      });
+
+      setFormData({
+        name: '',
+        dob: '',
+        category: '',
+        lastKnownLocation: '',
+        contactName: '',
+        contactPhone: '',
+        contactEmail: '',
+        description: ''
+      });
+    } catch (error) {
+      console.error('Error submitting missing person report:', error);
+      toast({
+        title: "Error",
+        description: "There was an error submitting the report. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -56,22 +124,38 @@ const ReportMissing = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="missing-name">Full Name *</Label>
-                <Input id="missing-name" placeholder="Enter full name of missing person" required />
+                <Label htmlFor="name">Full Name *</Label>
+                <Input 
+                  id="name"
+                  name="name"
+                  placeholder="Enter full name of missing person"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required 
+                />
               </div>
 
               <div>
-                <Label htmlFor="missing-dob">Date of Birth (Optional)</Label>
-                <Input id="missing-dob" type="date" />
+                <Label htmlFor="dob">Date of Birth (Optional)</Label>
+                <Input 
+                  id="dob"
+                  name="dob"
+                  type="date"
+                  value={formData.dob}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <div>
-                <Label htmlFor="missing-category">Category *</Label>
+                <Label htmlFor="category">Category *</Label>
                 <select 
-                  id="missing-category" 
+                  id="category"
+                  name="category"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  value={formData.category}
+                  onChange={handleInputChange}
                   required
                 >
                   <option value="">Select category</option>
@@ -83,35 +167,61 @@ const ReportMissing = () => {
               </div>
 
               <div>
-                <Label htmlFor="missing-location">Last Known Location *</Label>
+                <Label htmlFor="lastKnownLocation">Last Known Location *</Label>
                 <Input 
-                  id="missing-location" 
-                  placeholder="Enter last known location (address, city, landmarks)" 
+                  id="lastKnownLocation"
+                  name="lastKnownLocation"
+                  placeholder="Enter last known location (address, city, landmarks)"
+                  value={formData.lastKnownLocation}
+                  onChange={handleInputChange}
                   required 
                 />
               </div>
 
               <div>
-                <Label htmlFor="missing-contact">Your Contact Information *</Label>
-                <div className="space-y-2">
-                  <Input placeholder="Your name" required />
-                  <Input type="tel" placeholder="Your phone number" required />
-                  <Input type="email" placeholder="Your email address" required />
+                <Label>Your Contact Information *</Label>
+                <div className="space-y-2 mt-2">
+                  <Input 
+                    name="contactName"
+                    placeholder="Your name"
+                    value={formData.contactName}
+                    onChange={handleInputChange}
+                    required 
+                  />
+                  <Input 
+                    name="contactPhone"
+                    type="tel"
+                    placeholder="Your phone number"
+                    value={formData.contactPhone}
+                    onChange={handleInputChange}
+                    required 
+                  />
+                  <Input 
+                    name="contactEmail"
+                    type="email"
+                    placeholder="Your email address"
+                    value={formData.contactEmail}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="missing-description">Description *</Label>
+                <Label htmlFor="description">Description *</Label>
                 <Textarea 
-                  id="missing-description" 
+                  id="description"
+                  name="description"
                   placeholder="Provide detailed description including physical appearance, clothing when last seen, circumstances of disappearance, etc."
                   rows={5}
+                  value={formData.description}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="missing-photo">Photo (Optional)</Label>
+                <Label htmlFor="photo">Photo (Optional)</Label>
                 <div className="mt-2">
                   <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
                     <div className="text-center">
@@ -130,8 +240,8 @@ const ReportMissing = () => {
                 </p>
               </div>
 
-              <Button className="w-full" size="lg">
-                Submit Missing Person Report
+              <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit Missing Person Report'}
               </Button>
             </form>
           </CardContent>

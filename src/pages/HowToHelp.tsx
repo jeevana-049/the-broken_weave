@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, HelpCircle, Baby, Users, UserCheck } from "lucide-react";
+import { Heart, ArrowLeft, Baby, Users, UserCheck } from "lucide-react";
 
 const HowToHelp = () => {
   const navigate = useNavigate();
@@ -36,170 +36,135 @@ const HowToHelp = () => {
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <HelpCircle className="w-16 h-16 text-purple-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             How You Can Help
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Learn about the different ways you can make a meaningful impact in supporting 
-            vulnerable communities and helping reunite families.
+          <p className="text-lg text-gray-600">
+            Learn about the different ways you can make a difference in reuniting families and supporting those in need.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Help Children */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Helping Children */}
           <Card className="h-full">
             <CardHeader>
-              <Baby className="w-12 h-12 text-blue-500 mb-4" />
-              <CardTitle>Supporting Children</CardTitle>
-              <CardDescription>Ways to help children affected by communal unrest</CardDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <Baby className="w-8 h-8 text-blue-500" />
+                <CardTitle>Helping Children</CardTitle>
+              </div>
+              <CardDescription>
+                Supporting missing and vulnerable children
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Educational Support</h4>
-                <p className="text-sm text-gray-600">
-                  Provide educational materials, tutoring, and help establish temporary schools 
-                  in affected areas to ensure children don't lose their learning opportunities.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Immediate Support</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Report sightings immediately to authorities</li>
+                  <li>• Share missing child alerts on social media</li>
+                  <li>• Provide safe shelter and food if found</li>
+                  <li>• Contact child protection services</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Emotional Care</h4>
-                <p className="text-sm text-gray-600">
-                  Offer counseling services, organize recreational activities, and create 
-                  safe spaces where children can process trauma and heal.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Long-term Help</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Volunteer at local orphanages</li>
+                  <li>• Support educational programs</li>
+                  <li>• Donate children's clothing and supplies</li>
+                  <li>• Mentor reunited families</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Basic Needs</h4>
-                <p className="text-sm text-gray-600">
-                  Donate clothes, food, toys, and essential items. Sponsor meal programs 
-                  and provide medical care for displaced children.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Family Reunification</h4>
-                <p className="text-sm text-gray-600">
-                  Help maintain databases of separated children, assist in identification 
-                  processes, and support foster care programs when needed.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Prevention</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Educate communities about child safety</li>
+                  <li>• Support poverty alleviation programs</li>
+                  <li>• Advocate for stronger child protection laws</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
 
-          {/* Help Women */}
+          {/* Helping Women */}
           <Card className="h-full">
             <CardHeader>
-              <Users className="w-12 h-12 text-pink-500 mb-4" />
-              <CardTitle>Supporting Women</CardTitle>
-              <CardDescription>Ways to help women affected by communal unrest</CardDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <Users className="w-8 h-8 text-purple-500" />
+                <CardTitle>Helping Women</CardTitle>
+              </div>
+              <CardDescription>
+                Supporting missing and vulnerable women
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Safety & Security</h4>
-                <p className="text-sm text-gray-600">
-                  Provide safe shelter, security measures, and protection services. 
-                  Establish women-only safe spaces and emergency helplines.
-                </p>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Provide safe houses and shelters</li>
+                  <li>• Offer counseling and therapy services</li>
+                  <li>• Legal aid and support services</li>
+                  <li>• Emergency hotline support</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Economic Empowerment</h4>
-                <p className="text-sm text-gray-600">
-                  Offer skill development programs, microfinance opportunities, and 
-                  job placement assistance to help women become self-sufficient.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Empowerment</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Skill development and training programs</li>
+                  <li>• Financial literacy workshops</li>
+                  <li>• Job placement assistance</li>
+                  <li>• Microfinance opportunities</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Healthcare Access</h4>
-                <p className="text-sm text-gray-600">
-                  Provide medical care, mental health support, reproductive health services, 
-                  and specialized care for pregnant and nursing mothers.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Legal Support</h4>
-                <p className="text-sm text-gray-600">
-                  Offer legal aid, help with documentation, property rights assistance, 
-                  and support in cases of gender-based violence.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Community Support</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Create women's support groups</li>
+                  <li>• Raise awareness about women's rights</li>
+                  <li>• Support anti-trafficking initiatives</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
 
-          {/* Help Senior Citizens */}
+          {/* Helping Senior Citizens */}
           <Card className="h-full">
             <CardHeader>
-              <UserCheck className="w-12 h-12 text-green-500 mb-4" />
-              <CardTitle>Supporting Senior Citizens</CardTitle>
-              <CardDescription>Ways to help elderly people affected by communal unrest</CardDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <UserCheck className="w-8 h-8 text-green-500" />
+                <CardTitle>Helping Senior Citizens</CardTitle>
+              </div>
+              <CardDescription>
+                Supporting missing and elderly individuals
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Medical Care</h4>
-                <p className="text-sm text-gray-600">
-                  Provide specialized medical attention, chronic disease management, 
-                  medication access, and mobility assistance for elderly individuals.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Health & Care</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Medical care and health checkups</li>
+                  <li>• Medicine and healthcare supplies</li>
+                  <li>• Assisted living support</li>
+                  <li>• Mental health counseling</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Daily Living Support</h4>
-                <p className="text-sm text-gray-600">
-                  Assist with daily activities, provide caregiving services, ensure 
-                  nutritious meals, and help with personal hygiene and mobility.
-                </p>
+                <h4 className="font-semibold text-gray-900 mb-2">Social Support</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Regular companionship visits</li>
+                  <li>• Community engagement activities</li>
+                  <li>• Technology training for communication</li>
+                  <li>• Transport assistance</li>
+                </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Social Connection</h4>
-                <p className="text-sm text-gray-600">
-                  Organize social activities, provide companionship, facilitate 
-                  communication with family members, and prevent isolation.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Housing & Safety</h4>
-                <p className="text-sm text-gray-600">
-                  Ensure accessible housing, implement safety measures, provide 
-                  emergency response systems, and offer long-term care options.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* General Ways to Help */}
-        <div className="mt-16">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">General Ways to Contribute</CardTitle>
-              <CardDescription className="text-center">
-                Additional ways you can make a difference in our mission
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <h4 className="font-semibold text-gray-900 mb-2">Financial Donations</h4>
-                  <p className="text-sm text-gray-600">
-                    Monetary contributions help us provide immediate relief and long-term support services.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <h4 className="font-semibold text-gray-900 mb-2">Volunteer Time</h4>
-                  <p className="text-sm text-gray-600">
-                    Donate your time and skills to directly support affected communities and families.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <h4 className="font-semibold text-gray-900 mb-2">Spread Awareness</h4>
-                  <p className="text-sm text-gray-600">
-                    Share our mission on social media and help raise awareness about communal harmony.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <h4 className="font-semibold text-gray-900 mb-2">Advocate for Change</h4>
-                  <p className="text-sm text-gray-600">
-                    Support policy changes and community initiatives that promote peace and unity.
-                  </p>
-                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">Basic Needs</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Nutritious meals and food security</li>
+                  <li>• Safe housing arrangements</li>
+                  <li>• Financial support and pension help</li>
+                  <li>• Legal documentation assistance</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -207,23 +172,32 @@ const HowToHelp = () => {
 
         {/* Call to Action */}
         <div className="mt-12 text-center">
-          <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-            <CardContent className="pt-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Ready to Make a Difference?
-              </h3>
-              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                Every action, no matter how small, contributes to healing our communities 
-                and rebuilding the bonds that unite us.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => navigate('/volunteer')} size="lg">
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle>Ready to Make a Difference?</CardTitle>
+              <CardDescription>
+                Join our mission to reunite families and support those in need
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate('/volunteer')}
+                >
                   Become a Volunteer
                 </Button>
-                <Button onClick={() => navigate('/donate')} variant="outline" size="lg">
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate('/donate')}
+                >
                   Make a Donation
                 </Button>
               </div>
+              <p className="text-sm text-gray-600">
+                Every small action counts towards making a big difference in someone's life.
+              </p>
             </CardContent>
           </Card>
         </div>

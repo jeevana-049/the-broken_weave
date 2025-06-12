@@ -7,9 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Heart, Shield, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [loginData, setLoginData] = useState({ name: '', email: '', password: '' });
   const [registerData, setRegisterData] = useState({ 
     name: '', 
@@ -18,21 +21,90 @@ const Login = () => {
     password: '', 
     confirmPassword: '' 
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just navigate to dashboard
-    navigate('/dashboard');
+    setIsLoading(true);
+
+    try {
+      // For now, we'll store user data in our custom users table
+      // In a production app, you'd want to use Supabase Auth
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', loginData.email)
+        .single();
+
+      if (error || !data) {
+        toast({
+          title: "Login failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Login successful!",
+        description: "Welcome back to The Broken Weave."
+      });
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred during login. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (registerData.password !== registerData.confirmPassword) {
-      alert('Passwords do not match');
+      toast({
+        title: "Password mismatch",
+        description: "Passwords do not match. Please try again.",
+        variant: "destructive"
+      });
       return;
     }
-    // For now, just navigate to dashboard
-    navigate('/dashboard');
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .insert([
+          {
+            username: registerData.name,
+            email: registerData.email,
+            password: registerData.password // In production, this should be hashed
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Registration successful!",
+        description: "Welcome to The Broken Weave."
+      });
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration failed",
+        description: "An error occurred during registration. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGuestAccess = () => {
@@ -99,8 +171,8 @@ const Login = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Login
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Login'}
                   </Button>
                 </form>
               </TabsContent>
@@ -162,8 +234,8 @@ const Login = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Register
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Registering...' : 'Register'}
                   </Button>
                 </form>
               </TabsContent>

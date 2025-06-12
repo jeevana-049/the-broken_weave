@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,89 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { Heart, ArrowLeft, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Volunteer = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    skills: [] as string[],
+    availability: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const skillOptions = [
+    { id: 'medical', label: 'Medical/Healthcare' },
+    { id: 'counselling', label: 'Counselling/Psychology' },
+    { id: 'legal', label: 'Legal Aid' },
+    { id: 'education', label: 'Education/Teaching' },
+    { id: 'translation', label: 'Translation/Language' },
+    { id: 'other', label: 'Other' }
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('volunteers')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            skills: formData.skills.join(', '),
+            availability: formData.availability,
+            message: formData.message
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Application submitted successfully!",
+        description: "Thank you for volunteering. We'll contact you soon."
+      });
+
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        skills: [],
+        availability: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Error submitting volunteer application:', error);
+      toast({
+        title: "Error",
+        description: "There was an error submitting your application. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSkillChange = (skillId: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: checked 
+        ? [...prev.skills, skillId]
+        : prev.skills.filter(skill => skill !== skillId)
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -56,73 +136,90 @@ const Volunteer = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="volunteer-name">Full Name *</Label>
-                  <Input id="volunteer-name" placeholder="Enter your full name" required />
+                  <Label htmlFor="name">Full Name *</Label>
+                  <Input 
+                    id="name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="volunteer-email">Email *</Label>
-                  <Input id="volunteer-email" type="email" placeholder="Enter your email" required />
+                  <Label htmlFor="email">Email *</Label>
+                  <Input 
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor="volunteer-phone">Phone Number *</Label>
-                <Input id="volunteer-phone" type="tel" placeholder="Enter your phone number" required />
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input 
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required 
+                />
               </div>
 
               <div>
-                <Label htmlFor="volunteer-skills">Skills & Expertise</Label>
+                <Label>Skills & Expertise</Label>
                 <div className="mt-2 space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="medical" className="rounded" />
-                    <label htmlFor="medical" className="text-sm">Medical/Healthcare</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="counselling" className="rounded" />
-                    <label htmlFor="counselling" className="text-sm">Counselling/Psychology</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="legal" className="rounded" />
-                    <label htmlFor="legal" className="text-sm">Legal Aid</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="education" className="rounded" />
-                    <label htmlFor="education" className="text-sm">Education/Teaching</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="translation" className="rounded" />
-                    <label htmlFor="translation" className="text-sm">Translation/Language</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="other-skills" className="rounded" />
-                    <label htmlFor="other-skills" className="text-sm">Other</label>
-                  </div>
+                  {skillOptions.map((skill) => (
+                    <div key={skill.id} className="flex items-center space-x-2">
+                      <input 
+                        type="checkbox" 
+                        id={skill.id}
+                        className="rounded"
+                        checked={formData.skills.includes(skill.id)}
+                        onChange={(e) => handleSkillChange(skill.id, e.target.checked)}
+                      />
+                      <label htmlFor={skill.id} className="text-sm">{skill.label}</label>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="volunteer-availability">Availability</Label>
+                <Label htmlFor="availability">Availability</Label>
                 <Textarea 
-                  id="volunteer-availability" 
+                  id="availability"
+                  name="availability"
                   placeholder="Please describe your availability (days, times, frequency, etc.)"
                   rows={3}
+                  value={formData.availability}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div>
-                <Label htmlFor="volunteer-motivation">Why do you want to volunteer with us?</Label>
+                <Label htmlFor="message">Why do you want to volunteer with us?</Label>
                 <Textarea 
-                  id="volunteer-motivation" 
+                  id="message"
+                  name="message"
                   placeholder="Tell us about your motivation and how you'd like to help..."
                   rows={4}
+                  value={formData.message}
+                  onChange={handleInputChange}
                 />
               </div>
 
-              <Button className="w-full" size="lg">
-                Submit Volunteer Application
+              <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit Volunteer Application'}
               </Button>
             </form>
           </CardContent>
