@@ -9,7 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      donations: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: number
+          message: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: number
+          message?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: number
+          message?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      missing_persons: {
+        Row: {
+          category: string | null
+          contact_info: string | null
+          created_at: string | null
+          description: string | null
+          dob: string | null
+          id: number
+          image_url: string | null
+          is_reunited: boolean | null
+          last_known_location: string | null
+          name: string
+          reported_at: string | null
+          status: string | null
+        }
+        Insert: {
+          category?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          dob?: string | null
+          id?: number
+          image_url?: string | null
+          is_reunited?: boolean | null
+          last_known_location?: string | null
+          name: string
+          reported_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          category?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          dob?: string | null
+          id?: number
+          image_url?: string | null
+          is_reunited?: boolean | null
+          last_known_location?: string | null
+          name?: string
+          reported_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: number
+          is_admin: boolean | null
+          password: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: number
+          is_admin?: boolean | null
+          password?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: number
+          is_admin?: boolean | null
+          password?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
+      volunteers: {
+        Row: {
+          availability: string | null
+          email: string | null
+          id: number
+          message: string | null
+          name: string
+          phone: string | null
+          registered_at: string | null
+          skills: string | null
+        }
+        Insert: {
+          availability?: string | null
+          email?: string | null
+          id?: number
+          message?: string | null
+          name: string
+          phone?: string | null
+          registered_at?: string | null
+          skills?: string | null
+        }
+        Update: {
+          availability?: string | null
+          email?: string | null
+          id?: number
+          message?: string | null
+          name?: string
+          phone?: string | null
+          registered_at?: string | null
+          skills?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
