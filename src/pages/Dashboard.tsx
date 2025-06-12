@@ -18,28 +18,28 @@ const Dashboard = () => {
       description: "Support our mission to reunite families and help those in need",
       icon: HandHeart,
       color: "bg-green-500 hover:bg-green-600",
-      action: () => console.log("Navigate to donation page")
+      action: () => navigate('/donate')
     },
     {
       title: "Volunteer",
       description: "Join our team of volunteers making a difference in communities",
       icon: Users,
       color: "bg-blue-500 hover:bg-blue-600",
-      action: () => console.log("Navigate to volunteer page")
+      action: () => navigate('/volunteer')
     },
     {
       title: "Report Missing",
       description: "Report missing children, women, or senior citizens",
       icon: AlertTriangle,
       color: "bg-red-500 hover:bg-red-600",
-      action: () => console.log("Navigate to report missing page")
+      action: () => navigate('/report-missing')
     },
     {
       title: "How to Help",
       description: "Learn about different ways you can contribute to our cause",
       icon: HelpCircle,
       color: "bg-purple-500 hover:bg-purple-600",
-      action: () => console.log("Navigate to help page")
+      action: () => navigate('/how-to-help')
     }
   ];
 
