@@ -13,11 +13,10 @@ import { useToast } from "@/hooks/use-toast";
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loginData, setLoginData] = useState({ name: '', email: '', password: '' });
+  const [loginData, setLoginData] = useState({ usernameOrEmail: '', password: '' });
   const [registerData, setRegisterData] = useState({ 
-    name: '', 
+    username: '', 
     email: '', 
-    mobile: '', 
     password: '', 
     confirmPassword: '' 
   });
@@ -28,29 +27,35 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // For now, we'll store user data in our custom users table
-      // In a production app, you'd want to use Supabase Auth
+      // Check if input is email or username
+      const isEmail = loginData.usernameOrEmail.includes('@');
+      
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('email', loginData.email)
+        .or(isEmail ? `email.eq.${loginData.usernameOrEmail}` : `username.eq.${loginData.usernameOrEmail}`)
+        .eq('password', loginData.password)
         .single();
 
       if (error || !data) {
         toast({
           title: "Login failed",
-          description: "Invalid credentials. Please try again.",
+          description: "Invalid username/email or password. Please try again.",
           variant: "destructive"
         });
         return;
       }
+
+      // Store user session in localStorage
+      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem('isGuest', 'false');
 
       toast({
         title: "Login successful!",
         description: "Welcome back to The Broken Weave."
       });
 
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -77,13 +82,29 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      // Check if username or email already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('*')
+        .or(`username.eq.${registerData.username},email.eq.${registerData.email}`)
+        .single();
+
+      if (existingUser) {
+        toast({
+          title: "Registration failed",
+          description: "Username or email already exists. Please try different credentials.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('users')
         .insert([
           {
-            username: registerData.name,
+            username: registerData.username,
             email: registerData.email,
-            password: registerData.password // In production, this should be hashed
+            password: registerData.password
           }
         ]);
 
@@ -91,10 +112,12 @@ const Login = () => {
 
       toast({
         title: "Registration successful!",
-        description: "Welcome to The Broken Weave."
+        description: "Welcome to The Broken Weave. Please login with your credentials."
       });
 
-      navigate('/dashboard');
+      // Clear form and switch to login tab
+      setRegisterData({ username: '', email: '', password: '', confirmPassword: '' });
+      setLoginData({ usernameOrEmail: registerData.username, password: '' });
     } catch (error) {
       console.error('Registration error:', error);
       toast({
@@ -108,7 +131,9 @@ const Login = () => {
   };
 
   const handleGuestAccess = () => {
-    navigate('/dashboard');
+    localStorage.setItem('isGuest', 'true');
+    localStorage.removeItem('user');
+    navigate('/home');
   };
 
   return (
@@ -139,24 +164,13 @@ const Login = () => {
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-name">Name</Label>
+                    <Label htmlFor="login-username-email">Username or Email</Label>
                     <Input
-                      id="login-name"
+                      id="login-username-email"
                       type="text"
-                      placeholder="Enter your name"
-                      value={loginData.name}
-                      onChange={(e) => setLoginData({...loginData, name: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                      placeholder="Enter your username or email"
+                      value={loginData.usernameOrEmail}
+                      onChange={(e) => setLoginData({...loginData, usernameOrEmail: e.target.value})}
                       required
                     />
                   </div>
@@ -180,13 +194,13 @@ const Login = () => {
               <TabsContent value="register">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-name">Name</Label>
+                    <Label htmlFor="register-username">Username</Label>
                     <Input
-                      id="register-name"
+                      id="register-username"
                       type="text"
-                      placeholder="Enter your full name"
-                      value={registerData.name}
-                      onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
+                      placeholder="Choose a username"
+                      value={registerData.username}
+                      onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
                       required
                     />
                   </div>
@@ -198,17 +212,6 @@ const Login = () => {
                       placeholder="Enter your email"
                       value={registerData.email}
                       onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-mobile">Mobile Number</Label>
-                    <Input
-                      id="register-mobile"
-                      type="tel"
-                      placeholder="Enter your mobile number"
-                      value={registerData.mobile}
-                      onChange={(e) => setRegisterData({...registerData, mobile: e.target.value})}
                       required
                     />
                   </div>

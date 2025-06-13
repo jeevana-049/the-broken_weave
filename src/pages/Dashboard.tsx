@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -7,9 +7,31 @@ import { Heart, HandHeart, Users, AlertTriangle, HelpCircle, ArrowLeft } from "l
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [isGuest, setIsGuest] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const guestStatus = localStorage.getItem('isGuest') === 'true';
+    const userData = localStorage.getItem('user');
+    
+    // Redirect to login if no authentication
+    if (!guestStatus && !userData) {
+      navigate('/');
+      return;
+    }
+    
+    setIsGuest(guestStatus);
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, [navigate]);
 
   const handleNavigateToHome = () => {
     navigate('/home');
+  };
+
+  const handleGuestRestriction = () => {
+    alert('Please register or login to access this feature');
   };
 
   const dashboardOptions = [
@@ -18,21 +40,21 @@ const Dashboard = () => {
       description: "Support our mission to reunite families and help those in need",
       icon: HandHeart,
       color: "bg-green-500 hover:bg-green-600",
-      action: () => navigate('/donate')
+      action: () => isGuest ? handleGuestRestriction() : navigate('/donate')
     },
     {
       title: "Volunteer",
       description: "Join our team of volunteers making a difference in communities",
       icon: Users,
       color: "bg-blue-500 hover:bg-blue-600",
-      action: () => navigate('/volunteer')
+      action: () => isGuest ? handleGuestRestriction() : navigate('/volunteer')
     },
     {
       title: "Report Missing",
       description: "Report missing children, women, or senior citizens",
       icon: AlertTriangle,
       color: "bg-red-500 hover:bg-red-600",
-      action: () => navigate('/report-missing')
+      action: () => isGuest ? handleGuestRestriction() : navigate('/report-missing')
     },
     {
       title: "How to Help",
@@ -42,6 +64,12 @@ const Dashboard = () => {
       action: () => navigate('/how-to-help')
     }
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('isGuest');
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -53,7 +81,9 @@ const Dashboard = () => {
               <Heart className="h-8 w-8 text-red-500" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
-                <p className="text-sm text-gray-600">Dashboard</p>
+                <p className="text-sm text-gray-600">
+                  {isGuest ? 'Dashboard (Guest Mode)' : 'Dashboard'}
+                </p>
               </div>
             </div>
             <div className="flex gap-4">
@@ -67,9 +97,9 @@ const Dashboard = () => {
               </Button>
               <Button 
                 variant="ghost" 
-                onClick={() => navigate('/')}
+                onClick={handleLogout}
               >
-                Logout
+                {isGuest ? 'Login' : 'Logout'}
               </Button>
             </div>
           </div>
@@ -80,12 +110,22 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            How Would You Like to Help?
+            {isGuest ? 'View Our Services' : 'How Would You Like to Help?'}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Choose from the options below to make a meaningful impact in reuniting families 
-            and supporting vulnerable communities.
+            {isGuest 
+              ? 'Explore our services. To access full features and contribute, please register or login.'
+              : 'Choose from the options below to make a meaningful impact in reuniting families and supporting vulnerable communities.'
+            }
           </p>
+          {isGuest && (
+            <Button 
+              className="mt-4" 
+              onClick={() => navigate('/')}
+            >
+              Register / Login for Full Access
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -106,8 +146,9 @@ const Dashboard = () => {
                   <Button 
                     className="w-full" 
                     onClick={option.action}
+                    disabled={isGuest && option.title !== "How to Help"}
                   >
-                    Get Started
+                    {isGuest && option.title !== "How to Help" ? 'Login Required' : 'Get Started'}
                   </Button>
                 </CardContent>
               </Card>

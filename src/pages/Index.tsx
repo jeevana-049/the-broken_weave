@@ -16,20 +16,45 @@ import {
   Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [isGuest, setIsGuest] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const guestStatus = localStorage.getItem('isGuest') === 'true';
+    const userData = localStorage.getItem('user');
+    setIsGuest(guestStatus);
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const handleGetStarted = () => {
+    if (isGuest) {
+      // Guests can only view, show a message
+      alert('Please register or login to access full features');
+      return;
+    }
     navigate('/dashboard');
   };
 
   const handleSearchClick = () => {
+    // Everyone can search missing persons
     navigate('/dashboard');
   };
 
   const handleResourceClick = () => {
+    // Everyone can view resources
     navigate('/dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('isGuest');
+    navigate('/');
   };
 
   return (
@@ -50,12 +75,25 @@ const Index = () => {
               <a href="#contact" className="text-gray-700 hover:text-blue-600">Contact</a>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/')}>
-                Login
-              </Button>
-              <Button onClick={() => navigate('/dashboard')}>
-                Dashboard
-              </Button>
+              {user || isGuest ? (
+                <>
+                  {isGuest && (
+                    <span className="text-sm text-gray-600 py-2 px-3">Guest Mode</span>
+                  )}
+                  {!isGuest && (
+                    <Button onClick={() => navigate('/dashboard')}>
+                      Dashboard
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={handleLogout}>
+                    {isGuest ? 'Login' : 'Logout'}
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={() => navigate('/')}>
+                  Login
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -72,8 +110,13 @@ const Index = () => {
             Together, we can heal the broken weave of our communities.
           </p>
           <Button size="lg" className="text-lg px-8 py-3" onClick={handleGetStarted}>
-            Get Started
+            {isGuest ? 'View Information' : 'Get Started'}
           </Button>
+          {isGuest && (
+            <p className="text-sm text-gray-500 mt-2">
+              Register to access full features and contribute
+            </p>
+          )}
         </div>
       </section>
 
@@ -268,7 +311,9 @@ const Index = () => {
                   <Label htmlFor="contact-message">Message</Label>
                   <textarea id="contact-message" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Your Message" rows={4}></textarea>
                 </div>
-                <Button className="w-full">Send Message</Button>
+                <Button className="w-full" disabled={isGuest}>
+                  {isGuest ? 'Login Required to Send' : 'Send Message'}
+                </Button>
               </form>
             </div>
           </div>
