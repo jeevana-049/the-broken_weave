@@ -15,6 +15,10 @@ import LegalAid from "./pages/LegalAid";
 import EmergencyHelplines from "./pages/EmergencyHelplines";
 import CounsellingServices from "./pages/CounsellingServices";
 import NotFound from "./pages/NotFound";
+import ManageUsers from "./pages/admin/ManageUsers";
+import ManageReports from "./pages/admin/ManageReports";
+import SuccessStories from "./pages/admin/SuccessStories";
+import SystemSettings from "./pages/admin/SystemSettings";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +39,10 @@ const App = () => (
           <Route path="/legal-aid" element={<LegalAid />} />
           <Route path="/emergency-helplines" element={<EmergencyHelplines />} />
           <Route path="/counselling-services" element={<CounsellingServices />} />
+          <Route path="/admin/users" element={<ManageUsers />} />
+          <Route path="/admin/reports" element={<ManageReports />} />
+          <Route path="/admin/success-stories" element={<SuccessStories />} />
+          <Route path="/admin/settings" element={<SystemSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, HandHeart, Users, AlertTriangle, HelpCircle, ArrowLeft, Shield, Settings, Database } from "lucide-react";
+import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ const Dashboard = () => {
     const guestStatus = localStorage.getItem('isGuest') === 'true';
     const userData = localStorage.getItem('user');
     
-    // Redirect to login if no authentication
     if (!guestStatus && !userData) {
       navigate('/');
       return;
@@ -59,27 +58,6 @@ const Dashboard = () => {
       icon: AlertTriangle,
       color: "bg-red-500 hover:bg-red-600",
       action: () => isGuest ? handleGuestRestriction() : navigate('/report-missing')
-    },
-    {
-      title: "Legal Aid",
-      description: "Access free legal assistance and guidance",
-      icon: Shield,
-      color: "bg-purple-500 hover:bg-purple-600",
-      action: () => navigate('/legal-aid')
-    },
-    {
-      title: "Emergency Helplines",
-      description: "24/7 emergency support and crisis intervention",
-      icon: HelpCircle,
-      color: "bg-orange-500 hover:bg-orange-600",
-      action: () => navigate('/emergency-helplines')
-    },
-    {
-      title: "Counselling Services",
-      description: "Professional counseling and emotional support",
-      icon: Heart,
-      color: "bg-pink-500 hover:bg-pink-600",
-      action: () => navigate('/counselling-services')
     }
   ];
 
@@ -97,6 +75,13 @@ const Dashboard = () => {
       icon: Database,
       color: "bg-indigo-600 hover:bg-indigo-700",
       action: () => navigate('/admin/reports')
+    },
+    {
+      title: "Success Stories",
+      description: "Create and manage success stories",
+      icon: BookOpen,
+      color: "bg-purple-600 hover:bg-purple-700",
+      action: () => navigate('/admin/success-stories')
     },
     {
       title: "System Settings",
@@ -176,7 +161,7 @@ const Dashboard = () => {
         {isAdmin && !isGuest && (
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Administrative Tools</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
               {adminOptions.map((option, index) => {
                 const IconComponent = option.icon;
                 return (
@@ -226,9 +211,9 @@ const Dashboard = () => {
                   <Button 
                     className="w-full" 
                     onClick={option.action}
-                    disabled={isGuest && !["Legal Aid", "Emergency Helplines", "Counselling Services"].includes(option.title)}
+                    disabled={isGuest}
                   >
-                    {isGuest && !["Legal Aid", "Emergency Helplines", "Counselling Services"].includes(option.title) ? 'Login Required' : 'Get Started'}
+                    {isGuest ? 'Login Required' : 'Get Started'}
                   </Button>
                 </CardContent>
               </Card>

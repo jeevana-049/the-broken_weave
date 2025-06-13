@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('login');
   const [loginData, setLoginData] = useState({ usernameOrEmail: '', password: '' });
   const [registerData, setRegisterData] = useState({ 
     username: '', 
@@ -22,7 +23,6 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -32,15 +32,27 @@ const Login = () => {
     return emailRegex.test(email);
   };
 
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Check if input contains @ (email format)
+      if (!loginData.usernameOrEmail || !loginData.password) {
+        toast({
+          title: "Missing credentials",
+          description: "Please enter both username/email and password.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const isEmail = loginData.usernameOrEmail.includes('@');
       
-      // If it looks like an email, validate it
       if (isEmail && !validateEmail(loginData.usernameOrEmail)) {
         toast({
           title: "Invalid email format",
@@ -61,13 +73,12 @@ const Login = () => {
       if (error || !data) {
         toast({
           title: "Login failed",
-          description: "Invalid username/email or password. Please try again.",
+          description: "Invalid username/email or password. Please check your credentials and try again.",
           variant: "destructive"
         });
         return;
       }
 
-      // Store user session in localStorage
       localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('isGuest', 'false');
 
@@ -91,42 +102,72 @@ const Login = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate email format
-    if (!validateEmail(registerData.email)) {
-      toast({
-        title: "Invalid email format",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (registerData.password !== registerData.confirmPassword) {
-      toast({
-        title: "Password mismatch",
-        description: "Passwords do not match. Please try again.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
+      // Validation
+      if (!registerData.username || !registerData.email || !registerData.password || !registerData.confirmPassword) {
+        toast({
+          title: "Missing information",
+          description: "Please fill in all required fields.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (!validateEmail(registerData.email)) {
+        toast({
+          title: "Invalid email format",
+          description: "Please enter a valid email address.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (!validatePassword(registerData.password)) {
+        toast({
+          title: "Password too short",
+          description: "Password must be at least 6 characters long.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (registerData.password !== registerData.confirmPassword) {
+        toast({
+          title: "Password mismatch",
+          description: "Passwords do not match. Please ensure both password fields are identical.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Check if username or email already exists
-      const { data: existingUser, error: checkError } = await supabase
+      const { data: existingUser } = await supabase
         .from('users')
-        .select('*')
+        .select('username, email')
         .or(`username.eq.${registerData.username},email.eq.${registerData.email}`)
         .single();
 
       if (existingUser) {
-        toast({
-          title: "Registration failed",
-          description: "Username or email already exists. Please try different credentials.",
-          variant: "destructive"
-        });
+        if (existingUser.username === registerData.username) {
+          toast({
+            title: "Username already exists",
+            description: "This username is already taken. Please choose a different one.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Email already registered",
+            description: "An account with this email already exists. Please use a different email or try logging in.",
+            variant: "destructive"
+          });
+        }
+        setIsLoading(false);
         return;
       }
 
@@ -144,12 +185,13 @@ const Login = () => {
 
       toast({
         title: "Registration successful!",
-        description: "Welcome to The Broken Weave. Please login with your credentials."
+        description: "Your account has been created successfully. You can now login with your credentials."
       });
 
-      // Clear form and switch to login tab
+      // Clear registration form and switch to login tab
       setRegisterData({ username: '', email: '', password: '', confirmPassword: '' });
       setLoginData({ usernameOrEmail: registerData.username, password: '' });
+      setActiveTab('login');
     } catch (error) {
       console.error('Registration error:', error);
       toast({
@@ -183,11 +225,11 @@ const Login = () => {
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
             <CardDescription>
-              Access your account or continue as guest
+              Create an account or login to access full features
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
@@ -226,40 +268,40 @@ const Login = () => {
               <TabsContent value="register">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-username">Username</Label>
+                    <Label htmlFor="register-username">Username *</Label>
                     <Input
                       id="register-username"
                       type="text"
-                      placeholder="Choose a username"
+                      placeholder="Choose a unique username"
                       value={registerData.username}
                       onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
+                    <Label htmlFor="register-email">Email *</Label>
                     <Input
                       id="register-email"
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="Enter your email address"
                       value={registerData.email}
                       onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Password</Label>
+                    <Label htmlFor="register-password">Password *</Label>
                     <Input
                       id="register-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a strong password (min 6 characters)"
                       value={registerData.password}
                       onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label htmlFor="confirm-password">Confirm Password *</Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -269,8 +311,11 @@ const Login = () => {
                       required
                     />
                   </div>
+                  <p className="text-xs text-gray-500">
+                    * Required fields. After registration, you can login with your username or email.
+                  </p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Registering...' : 'Register'}
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
               </TabsContent>

@@ -17,11 +17,13 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
   const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState(null);
+  const [successStories, setSuccessStories] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,11 +33,29 @@ const Index = () => {
     if (userData) {
       setUser(JSON.parse(userData));
     }
+    
+    // Fetch success stories
+    fetchSuccessStories();
   }, []);
+
+  const fetchSuccessStories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('success_stories')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setSuccessStories(data || []);
+    } catch (error) {
+      console.error('Error fetching success stories:', error);
+    }
+  };
 
   const handleGetStarted = () => {
     if (isGuest) {
-      // Guests can only view, show a message
       alert('Please register or login to access full features');
       return;
     }
@@ -43,12 +63,6 @@ const Index = () => {
   };
 
   const handleSearchClick = () => {
-    // Everyone can search missing persons
-    navigate('/dashboard');
-  };
-
-  const handleResourceClick = () => {
-    // Everyone can view resources
     navigate('/dashboard');
   };
 
@@ -154,14 +168,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Resources Section */}
+      {/* Resources Section - Direct Navigation */}
       <section id="resources" className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Resources & Support
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleResourceClick}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/emergency-helplines')}>
               <CardHeader>
                 <Shield className="w-12 h-12 text-blue-500 mb-4" />
                 <CardTitle>Emergency Helplines</CardTitle>
@@ -171,7 +185,7 @@ const Index = () => {
               </CardHeader>
             </Card>
             
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleResourceClick}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/legal-aid')}>
               <CardHeader>
                 <FileText className="w-12 h-12 text-green-500 mb-4" />
                 <CardTitle>Legal Aid</CardTitle>
@@ -181,10 +195,10 @@ const Index = () => {
               </CardHeader>
             </Card>
             
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleResourceClick}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/counselling-services')}>
               <CardHeader>
                 <Users className="w-12 h-12 text-purple-500 mb-4" />
-                <CardTitle>Counseling Services</CardTitle>
+                <CardTitle>Counselling Services</CardTitle>
                 <CardDescription>
                   Professional counseling and emotional support programs
                 </CardDescription>
@@ -201,41 +215,58 @@ const Index = () => {
             Success Stories
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="bg-blue-50 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">A Mother's Reunion</CardTitle>
-                <CardDescription>After years of separation, a mother and her child are reunited.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">
-                  "I had lost all hope, but The Broken Weave never gave up. Today, I hold my child in my arms again."
-                </p>
-              </CardContent>
-            </Card>
+            {successStories.length > 0 ? (
+              successStories.map((story, index) => (
+                <Card key={story.id} className="bg-blue-50 hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">{story.title}</CardTitle>
+                    <CardDescription>{story.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">{story.content}</p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              // Default stories if none in database
+              <>
+                <Card className="bg-blue-50 hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">A Mother's Reunion</CardTitle>
+                    <CardDescription>After years of separation, a mother and her child are reunited.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">
+                      "I had lost all hope, but The Broken Weave never gave up. Today, I hold my child in my arms again."
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="bg-green-50 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">Elderly Woman Finds Safety</CardTitle>
-                <CardDescription>A senior citizen displaced by unrest finds a new home and community.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">
-                  "I was alone and scared, but The Broken Weave provided me with shelter, care, and a sense of belonging."
-                </p>
-              </CardContent>
-            </Card>
+                <Card className="bg-green-50 hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">Elderly Woman Finds Safety</CardTitle>
+                    <CardDescription>A senior citizen displaced by unrest finds a new home and community.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">
+                      "I was alone and scared, but The Broken Weave provided me with shelter, care, and a sense of belonging."
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="bg-purple-50 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">A Child's Education Restored</CardTitle>
-                <CardDescription>A young boy's education is restarted after losing everything in the conflict.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">
-                  "I thought my dreams were over, but The Broken Weave gave me the chance to learn again and build a future."
-                </p>
-              </CardContent>
-            </Card>
+                <Card className="bg-purple-50 hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">A Child's Education Restored</CardTitle>
+                    <CardDescription>A young boy's education is restarted after losing everything in the conflict.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">
+                      "I thought my dreams were over, but The Broken Weave gave me the chance to learn again and build a future."
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
         </div>
       </section>
