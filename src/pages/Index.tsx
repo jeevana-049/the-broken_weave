@@ -24,6 +24,7 @@ const Index = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const guestStatus = localStorage.getItem('isGuest') === 'true';
     const userData = localStorage.getItem('user');
     setIsGuest(guestStatus);

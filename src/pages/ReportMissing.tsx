@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, AlertTriangle, Upload } from "lucide-react";
+import { Heart, ArrowLeft, AlertTriangle, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,13 +23,86 @@ const ReportMissing = () => {
     contactEmail: '',
     description: ''
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 10MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select a valid image file.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      // For now, we'll create a placeholder URL since storage isn't set up
+      // In a real implementation, you would upload to Supabase Storage
+      return `https://placeholder-url.com/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      let imageUrl = null;
+      
+      // Upload image if selected
+      if (selectedImage) {
+        imageUrl = await uploadImage(selectedImage);
+        if (!imageUrl) {
+          toast({
+            title: "Image upload failed",
+            description: "Could not upload image. Report will be submitted without image.",
+            variant: "destructive"
+          });
+        }
+      }
+
       const contactInfo = `Name: ${formData.contactName}, Phone: ${formData.contactPhone}, Email: ${formData.contactEmail}`;
       
       const { error } = await supabase
@@ -41,7 +114,8 @@ const ReportMissing = () => {
             category: formData.category,
             last_known_location: formData.lastKnownLocation,
             contact_info: contactInfo,
-            description: formData.description
+            description: formData.description,
+            image_url: imageUrl
           }
         ]);
 
@@ -62,6 +136,8 @@ const ReportMissing = () => {
         contactEmail: '',
         description: ''
       });
+      setSelectedImage(null);
+      setImagePreview(null);
     } catch (error) {
       console.error('Error submitting missing person report:', error);
       toast({
@@ -223,13 +299,36 @@ const ReportMissing = () => {
               <div>
                 <Label htmlFor="photo">Photo (Optional)</Label>
                 <div className="mt-2">
-                  <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                    <div className="text-center">
-                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Click to upload photo or drag and drop</p>
-                      <p className="text-xs text-gray-400">PNG, JPG up to 10MB</p>
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="w-full h-48 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                  </div>
+                  ) : (
+                    <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors cursor-pointer">
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">Click to upload photo or drag and drop</p>
+                        <p className="text-xs text-gray-400">PNG, JPG up to 10MB</p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
 

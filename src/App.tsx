@@ -11,6 +11,9 @@ import Donate from "./pages/Donate";
 import Volunteer from "./pages/Volunteer";
 import ReportMissing from "./pages/ReportMissing";
 import HowToHelp from "./pages/HowToHelp";
+import LegalAid from "./pages/LegalAid";
+import EmergencyHelplines from "./pages/EmergencyHelplines";
+import CounsellingServices from "./pages/CounsellingServices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +32,9 @@ const App = () => (
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/report-missing" element={<ReportMissing />} />
           <Route path="/how-to-help" element={<HowToHelp />} />
+          <Route path="/legal-aid" element={<LegalAid />} />
+          <Route path="/emergency-helplines" element={<EmergencyHelplines />} />
+          <Route path="/counselling-services" element={<CounsellingServices />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

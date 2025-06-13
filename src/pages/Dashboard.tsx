@@ -3,14 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, HandHeart, Users, AlertTriangle, HelpCircle, ArrowLeft } from "lucide-react";
+import { Heart, HandHeart, Users, AlertTriangle, HelpCircle, ArrowLeft, Shield, Settings, Database } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const guestStatus = localStorage.getItem('isGuest') === 'true';
     const userData = localStorage.getItem('user');
     
@@ -22,7 +24,9 @@ const Dashboard = () => {
     
     setIsGuest(guestStatus);
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      setIsAdmin(parsedUser.is_admin || false);
     }
   }, [navigate]);
 
@@ -57,11 +61,49 @@ const Dashboard = () => {
       action: () => isGuest ? handleGuestRestriction() : navigate('/report-missing')
     },
     {
-      title: "How to Help",
-      description: "Learn about different ways you can contribute to our cause",
-      icon: HelpCircle,
+      title: "Legal Aid",
+      description: "Access free legal assistance and guidance",
+      icon: Shield,
       color: "bg-purple-500 hover:bg-purple-600",
-      action: () => navigate('/how-to-help')
+      action: () => navigate('/legal-aid')
+    },
+    {
+      title: "Emergency Helplines",
+      description: "24/7 emergency support and crisis intervention",
+      icon: HelpCircle,
+      color: "bg-orange-500 hover:bg-orange-600",
+      action: () => navigate('/emergency-helplines')
+    },
+    {
+      title: "Counselling Services",
+      description: "Professional counseling and emotional support",
+      icon: Heart,
+      color: "bg-pink-500 hover:bg-pink-600",
+      action: () => navigate('/counselling-services')
+    }
+  ];
+
+  const adminOptions = [
+    {
+      title: "Manage Users",
+      description: "View and manage registered users",
+      icon: Users,
+      color: "bg-gray-700 hover:bg-gray-800",
+      action: () => navigate('/admin/users')
+    },
+    {
+      title: "Manage Reports",
+      description: "Review and update missing person reports",
+      icon: Database,
+      color: "bg-indigo-600 hover:bg-indigo-700",
+      action: () => navigate('/admin/reports')
+    },
+    {
+      title: "System Settings",
+      description: "Configure system settings and preferences",
+      icon: Settings,
+      color: "bg-slate-600 hover:bg-slate-700",
+      action: () => navigate('/admin/settings')
     }
   ];
 
@@ -82,7 +124,7 @@ const Dashboard = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
                 <p className="text-sm text-gray-600">
-                  {isGuest ? 'Dashboard (Guest Mode)' : 'Dashboard'}
+                  {isGuest ? 'Dashboard (Guest Mode)' : isAdmin ? 'Admin Dashboard' : 'Dashboard'}
                 </p>
               </div>
             </div>
@@ -110,11 +152,13 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            {isGuest ? 'View Our Services' : 'How Would You Like to Help?'}
+            {isGuest ? 'View Our Services' : isAdmin ? 'Admin Control Panel' : 'How Would You Like to Help?'}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             {isGuest 
               ? 'Explore our services. To access full features and contribute, please register or login.'
+              : isAdmin
+              ? 'Manage the platform and help coordinate relief efforts efficiently.'
               : 'Choose from the options below to make a meaningful impact in reuniting families and supporting vulnerable communities.'
             }
           </p>
@@ -128,7 +172,43 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {/* Admin Section */}
+        {isAdmin && !isGuest && (
+          <div className="mb-16">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Administrative Tools</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+              {adminOptions.map((option, index) => {
+                const IconComponent = option.icon;
+                return (
+                  <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-gray-300">
+                    <CardHeader className="text-center">
+                      <div className={`w-16 h-16 rounded-full ${option.color} flex items-center justify-center mx-auto mb-4`}>
+                        <IconComponent className="w-8 h-8 text-white" />
+                      </div>
+                      <CardTitle className="text-xl">{option.title}</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        {option.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button 
+                        className="w-full" 
+                        onClick={option.action}
+                        variant="secondary"
+                      >
+                        Access
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            <hr className="border-gray-300 mb-12" />
+          </div>
+        )}
+
+        {/* Regular Services */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {dashboardOptions.map((option, index) => {
             const IconComponent = option.icon;
             return (
@@ -146,9 +226,9 @@ const Dashboard = () => {
                   <Button 
                     className="w-full" 
                     onClick={option.action}
-                    disabled={isGuest && option.title !== "How to Help"}
+                    disabled={isGuest && !["Legal Aid", "Emergency Helplines", "Counselling Services"].includes(option.title)}
                   >
-                    {isGuest && option.title !== "How to Help" ? 'Login Required' : 'Get Started'}
+                    {isGuest && !["Legal Aid", "Emergency Helplines", "Counselling Services"].includes(option.title) ? 'Login Required' : 'Get Started'}
                   </Button>
                 </CardContent>
               </Card>

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,14 +22,35 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Check if input is email or username
+      // Check if input contains @ (email format)
       const isEmail = loginData.usernameOrEmail.includes('@');
       
+      // If it looks like an email, validate it
+      if (isEmail && !validateEmail(loginData.usernameOrEmail)) {
+        toast({
+          title: "Invalid email format",
+          description: "Please enter a valid email address.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -70,6 +91,17 @@ const Login = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email format
+    if (!validateEmail(registerData.email)) {
+      toast({
+        title: "Invalid email format",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (registerData.password !== registerData.confirmPassword) {
       toast({
         title: "Password mismatch",
