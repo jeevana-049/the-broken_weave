@@ -6,47 +6,40 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Heart, ArrowLeft, Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
+
+interface SuccessStory {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  is_published: boolean;
+  created_at: string;
+}
 
 const SuccessStories = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [stories, setStories] = useState([]);
+  const [stories, setStories] = useState<SuccessStory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [editingStory, setEditingStory] = useState(null);
+  const [editingStory, setEditingStory] = useState<SuccessStory | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     content: '',
-    category: 'general',
-    is_published: true
+    category: 'reunion'
   });
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    checkAdminAccess();
     fetchStories();
   }, []);
 
-  const checkAdminAccess = () => {
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      navigate('/');
-      return;
-    }
-    
-    const user = JSON.parse(userData);
-    if (!user.is_admin) {
-      navigate('/dashboard');
-      return;
-    }
-  };
-
   const fetchStories = async () => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('success_stories')
@@ -56,23 +49,22 @@ const SuccessStories = () => {
       if (error) throw error;
       setStories(data || []);
     } catch (error) {
-      console.error('Error fetching stories:', error);
+      console.error('Error fetching success stories:', error);
       toast({
         title: "Error",
         description: "Failed to fetch success stories.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const userData = localStorage.getItem('user');
-      const user = JSON.parse(userData);
-
       if (editingStory) {
         const { error } = await supabase
           .from('success_stories')
@@ -83,42 +75,31 @@ const SuccessStories = () => {
           .eq('id', editingStory.id);
 
         if (error) throw error;
-        
         toast({
-          title: "Success!",
-          description: "Story updated successfully."
+          title: "Success",
+          description: "Success story updated successfully!"
         });
       } else {
         const { error } = await supabase
           .from('success_stories')
-          .insert([{
-            ...formData,
-            created_by: user.id
-          }]);
+          .insert([formData]);
 
         if (error) throw error;
-        
         toast({
-          title: "Success!",
-          description: "Story created successfully."
+          title: "Success",
+          description: "Success story created successfully!"
         });
       }
 
-      setFormData({
-        title: '',
-        description: '',
-        content: '',
-        category: 'general',
-        is_published: true
-      });
+      setFormData({ title: '', description: '', content: '', category: 'reunion' });
       setShowForm(false);
       setEditingStory(null);
       fetchStories();
     } catch (error) {
-      console.error('Error saving story:', error);
+      console.error('Error saving success story:', error);
       toast({
         title: "Error",
-        description: "Failed to save story.",
+        description: "Failed to save success story.",
         variant: "destructive"
       });
     } finally {
@@ -126,19 +107,32 @@ const SuccessStories = () => {
     }
   };
 
-  const handleEdit = (story) => {
-    setEditingStory(story);
-    setFormData({
-      title: story.title,
-      description: story.description,
-      content: story.content,
-      category: story.category,
-      is_published: story.is_published
-    });
-    setShowForm(true);
+  const togglePublish = async (story: SuccessStory) => {
+    try {
+      const { error } = await supabase
+        .from('success_stories')
+        .update({ is_published: !story.is_published })
+        .eq('id', story.id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: `Story ${!story.is_published ? 'published' : 'unpublished'} successfully!`
+      });
+      
+      fetchStories();
+    } catch (error) {
+      console.error('Error toggling publish status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update publish status.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDelete = async (id) => {
+  const deleteStory = async (id: number) => {
     if (!confirm('Are you sure you want to delete this story?')) return;
 
     try {
@@ -150,8 +144,8 @@ const SuccessStories = () => {
       if (error) throw error;
       
       toast({
-        title: "Success!",
-        description: "Story deleted successfully."
+        title: "Success",
+        description: "Story deleted successfully!"
       });
       
       fetchStories();
@@ -165,29 +159,25 @@ const SuccessStories = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const startEdit = (story: SuccessStory) => {
+    setEditingStory(story);
+    setFormData({
+      title: story.title,
+      description: story.description,
+      content: story.content,
+      category: story.category
+    });
+    setShowForm(true);
   };
 
-  const cancelForm = () => {
-    setShowForm(false);
+  const cancelEdit = () => {
     setEditingStory(null);
-    setFormData({
-      title: '',
-      description: '',
-      content: '',
-      category: 'general',
-      is_published: true
-    });
+    setFormData({ title: '', description: '', content: '', category: 'reunion' });
+    setShowForm(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -195,7 +185,7 @@ const SuccessStories = () => {
               <Heart className="h-8 w-8 text-red-500" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
-                <p className="text-sm text-gray-600">Manage Success Stories</p>
+                <p className="text-sm text-gray-600">Success Stories Management</p>
               </div>
             </div>
             <Button 
@@ -210,21 +200,19 @@ const SuccessStories = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Success Stories Management</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Success Stories</h2>
           <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add New Story
           </Button>
         </div>
 
-        {/* Form */}
         {showForm && (
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>{editingStory ? 'Edit Story' : 'Create New Story'}</CardTitle>
+              <CardTitle>{editingStory ? 'Edit Story' : 'Create New Success Story'}</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -232,9 +220,8 @@ const SuccessStories = () => {
                   <Label htmlFor="title">Title</Label>
                   <Input
                     id="title"
-                    name="title"
                     value={formData.title}
-                    onChange={handleInputChange}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     required
                   />
                 </div>
@@ -242,45 +229,39 @@ const SuccessStories = () => {
                   <Label htmlFor="description">Description</Label>
                   <Input
                     id="description"
-                    name="description"
                     value={formData.description}
-                    onChange={handleInputChange}
-                    required
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   />
+                </div>
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <select
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="reunion">Reunion</option>
+                    <option value="rescue">Rescue</option>
+                    <option value="support">Support</option>
+                    <option value="recovery">Recovery</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="content">Content</Label>
                   <Textarea
                     id="content"
-                    name="content"
                     value={formData.content}
-                    onChange={handleInputChange}
-                    rows={4}
+                    onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                    rows={6}
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Input
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_published"
-                    checked={formData.is_published}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
-                  />
-                  <Label htmlFor="is_published">Published</Label>
-                </div>
-                <div className="flex gap-4">
+                <div className="flex gap-2">
                   <Button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : (editingStory ? 'Update Story' : 'Create Story')}
+                    {editingStory ? 'Update Story' : 'Create Story'}
                   </Button>
-                  <Button type="button" variant="outline" onClick={cancelForm}>
+                  <Button type="button" variant="outline" onClick={cancelEdit}>
                     Cancel
                   </Button>
                 </div>
@@ -289,46 +270,57 @@ const SuccessStories = () => {
           </Card>
         )}
 
-        {/* Stories List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stories.map((story) => (
-            <Card key={story.id} className="hover:shadow-lg transition-shadow">
+            <Card key={story.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{story.title}</CardTitle>
-                    <CardDescription>{story.description}</CardDescription>
+                    <CardDescription className="capitalize">{story.category}</CardDescription>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {story.is_published ? (
-                      <Eye className="w-4 h-4 text-green-500" title="Published" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" title="Unpublished" />
-                    )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => togglePublish(story)}
+                    >
+                      {story.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => startEdit(story)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteStory(story.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 text-sm mb-4 line-clamp-3">{story.content}</p>
-                <p className="text-xs text-gray-500 mb-4">
-                  Category: {story.category} | Created: {new Date(story.created_at).toLocaleDateString()}
-                </p>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(story)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(story.id)}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                {story.description && (
+                  <p className="text-sm text-gray-600 mb-3">{story.description}</p>
+                )}
+                <p className="text-sm text-gray-700 mb-3 line-clamp-3">{story.content}</p>
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>Status: {story.is_published ? 'Published' : 'Draft'}</span>
+                  <span>{new Date(story.created_at).toLocaleDateString()}</span>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {stories.length === 0 && (
+        {stories.length === 0 && !isLoading && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No success stories yet. Create your first one!</p>
+            <p className="text-gray-500">No success stories found. Create your first story!</p>
           </div>
         )}
       </main>

@@ -1,67 +1,65 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Users } from "lucide-react";
+import { Heart, ArrowLeft, Users, Clock, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { notifyVolunteerRegistration } from "@/utils/notificationService";
 
 const Volunteer = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    skills: [] as string[],
+    skills: '',
     availability: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const skillOptions = [
-    { id: 'medical', label: 'Medical/Healthcare' },
-    { id: 'counselling', label: 'Counselling/Psychology' },
-    { id: 'legal', label: 'Legal Aid' },
-    { id: 'education', label: 'Education/Teaching' },
-    { id: 'translation', label: 'Translation/Language' },
-    { id: 'other', label: 'Other' }
-  ];
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsLoading(true);
 
     try {
       const { error } = await supabase
         .from('volunteers')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            skills: formData.skills.join(', '),
-            availability: formData.availability,
-            message: formData.message
-          }
-        ]);
+        .insert([formData]);
 
       if (error) throw error;
 
+      // Send notification to admin
+      await notifyVolunteerRegistration(formData.name, formData.skills);
+
       toast({
-        title: "Application submitted successfully!",
-        description: "Thank you for volunteering. We'll contact you soon."
+        title: "Thank you for volunteering!",
+        description: "Your application has been submitted. We'll contact you soon with volunteer opportunities."
       });
 
       setFormData({
         name: '',
         email: '',
         phone: '',
-        skills: [],
+        skills: '',
         availability: '',
         message: ''
       });
@@ -69,26 +67,12 @@ const Volunteer = () => {
       console.error('Error submitting volunteer application:', error);
       toast({
         title: "Error",
-        description: "There was an error submitting your application. Please try again.",
+        description: "Failed to submit volunteer application. Please try again.",
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSkillChange = (skillId: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: checked 
-        ? [...prev.skills, skillId]
-        : prev.skills.filter(skill => skill !== skillId)
-    }));
   };
 
   return (
@@ -101,7 +85,7 @@ const Volunteer = () => {
               <Heart className="h-8 w-8 text-red-500" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
-                <p className="text-sm text-gray-600">Volunteer</p>
+                <p className="text-sm text-gray-600">Volunteer with Us</p>
               </div>
             </div>
             <Button 
@@ -121,109 +105,188 @@ const Volunteer = () => {
         <div className="text-center mb-12">
           <Users className="w-16 h-16 text-blue-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Join Our Volunteer Team
+            Join Our Volunteer Community
           </h2>
-          <p className="text-lg text-gray-600">
-            Make a difference in the lives of families and communities in need.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Make a difference in your community by volunteering with us. 
+            Help reunite families and support those affected by communal unrest.
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Volunteer Application</CardTitle>
-            <CardDescription>
-              Fill out the form below to apply as a volunteer with The Broken Weave.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Volunteer Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Volunteer Application</CardTitle>
+              <CardDescription>
+                Fill out this form to join our volunteer network.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Full Name *</Label>
-                  <Input 
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
                     id="name"
                     name="name"
-                    placeholder="Enter your full name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    required 
+                    required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email *</Label>
-                  <Input 
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required 
+                    required
                   />
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input 
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="Enter your phone number"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required 
-                />
-              </div>
-
-              <div>
-                <Label>Skills & Expertise</Label>
-                <div className="mt-2 space-y-2">
-                  {skillOptions.map((skill) => (
-                    <div key={skill.id} className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id={skill.id}
-                        className="rounded"
-                        checked={formData.skills.includes(skill.id)}
-                        onChange={(e) => handleSkillChange(skill.id, e.target.checked)}
-                      />
-                      <label htmlFor={skill.id} className="text-sm">{skill.label}</label>
-                    </div>
-                  ))}
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
-              </div>
+                <div>
+                  <Label htmlFor="skills">Skills & Expertise</Label>
+                  <Textarea
+                    id="skills"
+                    name="skills"
+                    value={formData.skills}
+                    onChange={handleInputChange}
+                    placeholder="e.g., First Aid, Counseling, Legal Aid, Translation, IT Support..."
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="availability">Availability</Label>
+                  <select
+                    id="availability"
+                    name="availability"
+                    value={formData.availability}
+                    onChange={handleInputChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required
+                  >
+                    <option value="">Select your availability</option>
+                    <option value="weekdays">Weekdays</option>
+                    <option value="weekends">Weekends</option>
+                    <option value="evenings">Evenings</option>
+                    <option value="flexible">Flexible</option>
+                    <option value="emergency-only">Emergency Only</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="message">Why do you want to volunteer?</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    placeholder="Tell us about your motivation and how you'd like to help..."
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Submitting...' : 'Submit Application'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label htmlFor="availability">Availability</Label>
-                <Textarea 
-                  id="availability"
-                  name="availability"
-                  placeholder="Please describe your availability (days, times, frequency, etc.)"
-                  rows={3}
-                  value={formData.availability}
-                  onChange={handleInputChange}
-                />
-              </div>
+          {/* Volunteer Information */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  How You Can Help
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">Search & Rescue Operations</h4>
+                      <p className="text-sm text-gray-600">Assist in organized search efforts for missing persons</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">Community Outreach</h4>
+                      <p className="text-sm text-gray-600">Help spread awareness and gather information</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">Support Services</h4>
+                      <p className="text-sm text-gray-600">Provide emotional support and practical assistance</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">Administrative Tasks</h4>
+                      <p className="text-sm text-gray-600">Help with data entry, coordination, and logistics</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <Label htmlFor="message">Why do you want to volunteer with us?</Label>
-                <Textarea 
-                  id="message"
-                  name="message"
-                  placeholder="Tell us about your motivation and how you'd like to help..."
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleInputChange}
-                />
-              </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Time Commitment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">
+                    <strong>Flexible Scheduling:</strong> We work around your availability
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Minimum Commitment:</strong> 2-4 hours per month
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Training Provided:</strong> We'll provide all necessary training and support
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Emergency Response:</strong> Optional participation in urgent situations
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit Volunteer Application'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Requirements</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p>• Must be 18 years or older</p>
+                  <p>• Background check required</p>
+                  <p>• Compassionate and reliable</p>
+                  <p>• Able to maintain confidentiality</p>
+                  <p>• Basic communication skills</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart, ArrowLeft, AlertTriangle, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { notifyMissingPersonReport } from "@/utils/notificationService";
 
 const ReportMissing = () => {
   const navigate = useNavigate();
@@ -72,12 +72,15 @@ const ReportMissing = () => {
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      
-      // For now, we'll create a placeholder URL since storage isn't set up
-      // In a real implementation, you would upload to Supabase Storage
-      return `https://placeholder-url.com/${fileName}`;
+      // For demo purposes, we'll use a placeholder URL
+      // In production, you would upload to Supabase Storage or another service
+      const placeholders = [
+        'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=400&fit=crop'
+      ];
+      return placeholders[Math.floor(Math.random() * placeholders.length)];
     } catch (error) {
       console.error('Error uploading image:', error);
       return null;
@@ -96,9 +99,8 @@ const ReportMissing = () => {
         imageUrl = await uploadImage(selectedImage);
         if (!imageUrl) {
           toast({
-            title: "Image upload failed",
-            description: "Could not upload image. Report will be submitted without image.",
-            variant: "destructive"
+            title: "Image upload simulated",
+            description: "For demo purposes, a placeholder image will be used.",
           });
         }
       }
@@ -120,6 +122,9 @@ const ReportMissing = () => {
         ]);
 
       if (error) throw error;
+
+      // Send notification to admin
+      await notifyMissingPersonReport(formData.name, formData.contactName);
 
       toast({
         title: "Report submitted successfully!",

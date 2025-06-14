@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageReports from "./pages/admin/ManageReports";
 import ManageVolunteers from "./pages/admin/ManageVolunteers";
+import ManageDonations from "./pages/admin/ManageDonations";
 import SuccessStories from "./pages/admin/SuccessStories";
 import SystemSettings from "./pages/admin/SystemSettings";
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/admin/users" element={<ManageUsers />} />
           <Route path="/admin/reports" element={<ManageReports />} />
           <Route path="/admin/volunteers" element={<ManageVolunteers />} />
+          <Route path="/admin/donations" element={<ManageDonations />} />
           <Route path="/admin/success-stories" element={<SuccessStories />} />
           <Route path="/admin/settings" element={<SystemSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

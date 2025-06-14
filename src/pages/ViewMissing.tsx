@@ -107,6 +107,21 @@ const ViewMissing = () => {
     }
   };
 
+  const getImageUrl = (imageUrl: string) => {
+    // If it's already a full URL, return it
+    if (imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) {
+      return imageUrl;
+    }
+    // Use placeholder images for demo
+    const placeholders = [
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=300&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=300&h=300&fit=crop'
+    ];
+    return placeholders[Math.floor(Math.random() * placeholders.length)];
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -163,8 +178,8 @@ const ViewMissing = () => {
                     <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="child">Child</SelectItem>
                     <SelectItem value="woman">Woman</SelectItem>
-                    <SelectItem value="senior">Senior Citizen</SelectItem>
-                    <SelectItem value="unknown">Unknown</SelectItem>
+                    <SelectItem value="senior-citizen">Senior Citizen</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -228,15 +243,18 @@ const ViewMissing = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {person.image_url && (
-                    <div className="mb-3">
-                      <img 
-                        src={person.image_url} 
-                        alt={person.name}
-                        className="w-full h-48 object-cover rounded-md"
-                      />
-                    </div>
-                  )}
+                  {/* Display image - always show an image */}
+                  <div className="mb-3">
+                    <img 
+                      src={person.image_url ? getImageUrl(person.image_url) : getImageUrl('')} 
+                      alt={person.name}
+                      className="w-full h-48 object-cover rounded-md"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=300&fit=crop';
+                      }}
+                    />
+                  </div>
                   
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex items-center gap-2">

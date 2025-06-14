@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen, UserCheck, Eye } from "lucide-react";
+import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen, UserCheck, Eye, DollarSign } from "lucide-react";
 import AdminNotifications from "@/components/AdminNotifications";
 
 const Dashboard = () => {
@@ -91,6 +92,13 @@ const Dashboard = () => {
       action: () => navigate('/admin/volunteers')
     },
     {
+      title: "Manage Donations",
+      description: "View and track donation records",
+      icon: DollarSign,
+      color: "bg-green-600 hover:bg-green-700",
+      action: () => navigate('/admin/donations')
+    },
+    {
       title: "Success Stories",
       description: "Create and manage success stories",
       icon: BookOpen,
@@ -176,7 +184,7 @@ const Dashboard = () => {
         {isAdmin && !isGuest && (
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Administrative Tools</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-12">
               {adminOptions.map((option, index) => {
                 const IconComponent = option.icon;
                 return (
