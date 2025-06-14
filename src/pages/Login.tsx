@@ -156,17 +156,17 @@ const Login = () => {
 
   if (currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-white">
         {/* Header with notifications for logged in users */}
-        <header className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-blue-100">
+        <header className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-full">
+                <div className="p-2 bg-red-500 rounded-full">
                   <Heart className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <h1 className="text-2xl font-bold text-gray-900">
                     The Broken Weave
                   </h1>
                   <p className="text-sm text-gray-600">Reuniting Families, Restoring Hope</p>
@@ -178,7 +178,7 @@ const Login = () => {
                   <p className="text-sm font-medium text-gray-700">Welcome, {currentUser.username}</p>
                   <p className="text-xs text-gray-500">{isAdmin ? 'Administrator' : 'User'}</p>
                 </div>
-                <Button onClick={() => navigate('/dashboard')} className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                <Button onClick={() => navigate('/dashboard')}>
                   Dashboard
                 </Button>
                 <Button variant="outline" onClick={handleLogout}>
@@ -192,7 +192,7 @@ const Login = () => {
         {/* Main content for logged in users */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Welcome Back!
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -201,7 +201,7 @@ const Login = () => {
             <Button 
               onClick={() => navigate('/dashboard')} 
               size="lg" 
-              className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              className="mt-6"
             >
               Go to Dashboard
             </Button>
@@ -209,25 +209,25 @@ const Login = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <Card className="bg-blue-50 border-blue-200">
               <CardContent className="p-6 text-center">
-                <Search className="w-12 h-12 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold">Search Missing</h3>
-                <p className="text-blue-100">Find missing persons</p>
+                <Search className="w-12 h-12 mx-auto mb-4 text-blue-600" />
+                <h3 className="text-2xl font-bold text-blue-900">Search Missing</h3>
+                <p className="text-blue-700">Find missing persons</p>
               </CardContent>
             </Card>
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <Card className="bg-green-50 border-green-200">
               <CardContent className="p-6 text-center">
-                <HandHeart className="w-12 h-12 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold">Help & Donate</h3>
-                <p className="text-green-100">Support our mission</p>
+                <HandHeart className="w-12 h-12 mx-auto mb-4 text-green-600" />
+                <h3 className="text-2xl font-bold text-green-900">Help & Donate</h3>
+                <p className="text-green-700">Support our mission</p>
               </CardContent>
             </Card>
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-red-500 to-red-600 text-white">
+            <Card className="bg-red-50 border-red-200">
               <CardContent className="p-6 text-center">
-                <AlertTriangle className="w-12 h-12 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold">Report Missing</h3>
-                <p className="text-red-100">Report a missing person</p>
+                <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-red-600" />
+                <h3 className="text-2xl font-bold text-red-900">Report Missing</h3>
+                <p className="text-red-700">Report a missing person</p>
               </CardContent>
             </Card>
           </div>
@@ -237,17 +237,17 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Enhanced Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-blue-100">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-full">
+              <div className="p-2 bg-red-500 rounded-full">
                 <Heart className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-gray-900">
                   The Broken Weave
                 </h1>
                 <p className="text-sm text-gray-600">Reuniting Families, Restoring Hope</p>
@@ -256,7 +256,6 @@ const Login = () => {
             <Button 
               variant="outline" 
               onClick={handleGuestAccess}
-              className="border-blue-200 text-blue-600 hover:bg-blue-50"
             >
               Continue as Guest
             </Button>
@@ -267,7 +266,7 @@ const Login = () => {
       {/* Hero Section */}
       <section className="py-20 text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+          <h2 className="text-5xl font-bold text-gray-900 mb-6">
             Bringing Families Together
           </h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
@@ -278,21 +277,21 @@ const Login = () => {
           {/* Feature highlights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Smart Search</h3>
               <p className="text-gray-600">Advanced search capabilities to find missing persons</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Community Support</h3>
               <p className="text-gray-600">Volunteer network and community assistance</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Secure Platform</h3>
@@ -305,7 +304,7 @@ const Login = () => {
       {/* Login/Register Section */}
       <section className="pb-20">
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+          <Card className="bg-white shadow-lg">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-2xl font-bold text-gray-800">Get Started</CardTitle>
               <CardDescription className="text-gray-600">
@@ -345,7 +344,7 @@ const Login = () => {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600" 
+                      className="w-full" 
                       disabled={isLoading}
                     >
                       {isLoading ? 'Signing In...' : 'Sign In'}
@@ -401,7 +400,7 @@ const Login = () => {
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600" 
+                      className="w-full" 
                       disabled={isLoading}
                     >
                       {isLoading ? 'Creating Account...' : 'Create Account'}
