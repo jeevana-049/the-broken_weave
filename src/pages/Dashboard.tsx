@@ -219,9 +219,10 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {dashboardOptions.map((option, index) => {
             const IconComponent = option.icon;
+            const isRestricted = isGuest && option.title !== "View Missing";
             return (
-              <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader className="text-center">
+              <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col">
+                <CardHeader className="text-center flex-grow">
                   <div className={`w-16 h-16 rounded-full ${option.color} flex items-center justify-center mx-auto mb-4`}>
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
@@ -230,13 +231,13 @@ const Dashboard = () => {
                     {option.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="mt-auto">
                   <Button 
                     className="w-full" 
                     onClick={option.action}
-                    disabled={isGuest && option.title !== "View Missing"}
+                    disabled={isRestricted}
                   >
-                    {(isGuest && option.title !== "View Missing") ? 'Login Required' : 'Get Started'}
+                    {isRestricted ? 'Login Required' : 'Get Started'}
                   </Button>
                 </CardContent>
               </Card>
