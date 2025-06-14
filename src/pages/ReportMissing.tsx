@@ -72,17 +72,16 @@ const ReportMissing = () => {
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
-      // For demo purposes, we'll use a placeholder URL
-      // In production, you would upload to Supabase Storage or another service
-      const placeholders = [
-        'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=400&fit=crop'
-      ];
-      return placeholders[Math.floor(Math.random() * placeholders.length)];
+      // Convert file to base64 for storing in database
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error processing image:', error);
       return null;
     }
   };
@@ -99,8 +98,9 @@ const ReportMissing = () => {
         imageUrl = await uploadImage(selectedImage);
         if (!imageUrl) {
           toast({
-            title: "Image upload simulated",
-            description: "For demo purposes, a placeholder image will be used.",
+            title: "Image upload failed",
+            description: "Could not process the image. Proceeding without image.",
+            variant: "destructive"
           });
         }
       }
@@ -161,7 +161,7 @@ const ReportMissing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

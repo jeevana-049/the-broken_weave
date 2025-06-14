@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { Heart, Users, Shield, Search, HandHeart, AlertTriangle } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { notifyUserLogin, notifyUserRegistration } from "@/utils/notificationService";
@@ -206,38 +206,13 @@ const Login = () => {
               Go to Dashboard
             </Button>
           </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-6 text-center">
-                <Search className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-                <h3 className="text-2xl font-bold text-blue-900">Search Missing</h3>
-                <p className="text-blue-700">Find missing persons</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-6 text-center">
-                <HandHeart className="w-12 h-12 mx-auto mb-4 text-green-600" />
-                <h3 className="text-2xl font-bold text-green-900">Help & Donate</h3>
-                <p className="text-green-700">Support our mission</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-red-50 border-red-200">
-              <CardContent className="p-6 text-center">
-                <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-red-600" />
-                <h3 className="text-2xl font-bold text-red-900">Report Missing</h3>
-                <p className="text-red-700">Report a missing person</p>
-              </CardContent>
-            </Card>
-          </div>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -263,47 +238,20 @@ const Login = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 text-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Bringing Families Together
           </h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
             A comprehensive platform dedicated to reuniting missing persons with their families. 
             Join our mission to restore hope and rebuild connections across communities.
           </p>
-          
-          {/* Feature highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Smart Search</h3>
-              <p className="text-gray-600">Advanced search capabilities to find missing persons</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Community Support</h3>
-              <p className="text-gray-600">Volunteer network and community assistance</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Secure Platform</h3>
-              <p className="text-gray-600">Safe and secure information handling</p>
-            </div>
-          </div>
         </div>
-      </section>
 
-      {/* Login/Register Section */}
-      <section className="pb-20">
-        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Login/Register Section */}
+        <div className="max-w-md mx-auto">
           <Card className="bg-white shadow-lg">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-2xl font-bold text-gray-800">Get Started</CardTitle>
@@ -411,7 +359,7 @@ const Login = () => {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </main>
     </div>
   );
 };
