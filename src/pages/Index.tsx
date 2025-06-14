@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -86,9 +87,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm">
+      <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
@@ -129,7 +130,7 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="py-20 px-4">
+      <section id="home" className="py-20 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Reuniting Families, Rebuilding Hope
@@ -155,7 +156,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Search Missing Persons Database
           </h2>
-          <Card className="max-w-2xl mx-auto">
+          <Card className="max-w-2xl mx-auto border">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div>
@@ -179,7 +180,7 @@ const Index = () => {
       </section>
 
       {/* View Missing Section */}
-      <section id="view" className="py-16 px-4">
+      <section id="view" className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             View Missing Persons
@@ -187,7 +188,7 @@ const Index = () => {
           <p className="text-lg text-gray-600 mb-8">
             Browse through our comprehensive database of missing persons and help us reunite families.
           </p>
-          <Card className="max-w-md mx-auto">
+          <Card className="max-w-md mx-auto border">
             <CardContent className="p-6">
               <Button 
                 onClick={() => navigate('/view-missing')} 
@@ -201,14 +202,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Resources Section - Direct Navigation */}
+      {/* Resources Section */}
       <section id="resources" className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Resources & Support
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/emergency-helplines')}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow border" onClick={() => navigate('/emergency-helplines')}>
               <CardHeader>
                 <Shield className="w-12 h-12 text-blue-500 mb-4" />
                 <CardTitle>Emergency Helplines</CardTitle>
@@ -218,7 +219,7 @@ const Index = () => {
               </CardHeader>
             </Card>
             
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/legal-aid')}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow border" onClick={() => navigate('/legal-aid')}>
               <CardHeader>
                 <FileText className="w-12 h-12 text-green-500 mb-4" />
                 <CardTitle>Legal Aid</CardTitle>
@@ -228,7 +229,7 @@ const Index = () => {
               </CardHeader>
             </Card>
             
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/counselling-services')}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow border" onClick={() => navigate('/counselling-services')}>
               <CardHeader>
                 <Users className="w-12 h-12 text-purple-500 mb-4" />
                 <CardTitle>Counselling Services</CardTitle>
@@ -242,7 +243,7 @@ const Index = () => {
       </section>
 
       {/* Success Stories Section */}
-      <section id="stories" className="py-16 px-4 bg-white">
+      <section id="stories" className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Success Stories
@@ -250,7 +251,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {successStories.length > 0 ? (
               successStories.map((story, index) => (
-                <Card key={story.id} className="bg-blue-50 hover:shadow-lg transition-shadow">
+                <Card key={story.id} className="bg-white hover:shadow-lg transition-shadow border">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold">{story.title}</CardTitle>
                     <CardDescription>{story.description}</CardDescription>
@@ -263,7 +264,7 @@ const Index = () => {
             ) : (
               // Default stories if none in database
               <>
-                <Card className="bg-blue-50 hover:shadow-lg transition-shadow">
+                <Card className="bg-white hover:shadow-lg transition-shadow border">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold">A Mother's Reunion</CardTitle>
                     <CardDescription>After years of separation, a mother and her child are reunited.</CardDescription>
@@ -275,7 +276,7 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-green-50 hover:shadow-lg transition-shadow">
+                <Card className="bg-white hover:shadow-lg transition-shadow border">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold">Elderly Woman Finds Safety</CardTitle>
                     <CardDescription>A senior citizen displaced by unrest finds a new home and community.</CardDescription>
@@ -287,7 +288,7 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-purple-50 hover:shadow-lg transition-shadow">
+                <Card className="bg-white hover:shadow-lg transition-shadow border">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold">A Child's Education Restored</CardTitle>
                     <CardDescription>A young boy's education is restarted after losing everything in the conflict.</CardDescription>
@@ -336,7 +337,7 @@ const Index = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 px-4">
+      <section id="contact" className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Contact Us

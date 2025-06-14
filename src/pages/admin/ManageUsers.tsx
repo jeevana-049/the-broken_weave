@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart, ArrowLeft, Search, UserCheck, UserX, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import AdminNotifications from "@/components/AdminNotifications";
 
 const ManageUsers = () => {
   const navigate = useNavigate();
@@ -88,9 +89,9 @@ const ManageUsers = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center gap-3">
@@ -100,14 +101,20 @@ const ManageUsers = () => {
                 <p className="text-sm text-gray-600">Manage Users</p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
-            </Button>
+            <div className="flex items-center gap-4">
+              <AdminNotifications />
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate('/dashboard');
+                }}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -135,7 +142,7 @@ const ManageUsers = () => {
         {/* Users List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers.map((user) => (
-            <Card key={user.id} className="hover:shadow-lg transition-shadow">
+            <Card key={user.id} className="hover:shadow-lg transition-shadow border">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>

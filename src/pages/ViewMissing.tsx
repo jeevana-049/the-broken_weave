@@ -36,6 +36,7 @@ const ViewMissing = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchMissingPersons();
   }, []);
 
@@ -143,20 +144,33 @@ const ViewMissing = () => {
   };
 
   const renderImage = (person: MissingPerson) => {
-    // Display actual uploaded images if they exist
-    if (person.image_url) {
+    console.log(`Rendering image for ${person.name}, URL: ${person.image_url}`);
+    
+    if (person.image_url && person.image_url.trim() !== '') {
       return (
-        <img
-          src={person.image_url}
-          alt={`Photo of ${person.name}`}
-          className="w-full h-64 object-cover rounded-lg mb-4"
-          onError={(e) => {
-            console.log('Failed to load image for:', person.name, 'URL:', person.image_url);
-            // If image fails to load, show placeholder
-            (e.target as HTMLImageElement).style.display = 'none';
-            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-          }}
-        />
+        <div className="w-full h-64 mb-4">
+          <img
+            src={person.image_url}
+            alt={`Photo of ${person.name}`}
+            className="w-full h-full object-cover rounded-lg"
+            onLoad={() => console.log(`Image loaded successfully for ${person.name}`)}
+            onError={(e) => {
+              console.error(`Failed to load image for ${person.name}:`, person.image_url);
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              const placeholder = target.nextElementSibling as HTMLElement;
+              if (placeholder) {
+                placeholder.style.display = 'flex';
+              }
+            }}
+          />
+          <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
+            <div className="text-center">
+              <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+              <p className="text-gray-500 text-sm">Image failed to load</p>
+            </div>
+          </div>
+        </div>
       );
     }
     
@@ -171,9 +185,9 @@ const ViewMissing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center gap-3">
@@ -189,7 +203,10 @@ const ViewMissing = () => {
             </div>
             <Button 
               variant="outline" 
-              onClick={() => navigate('/dashboard')}
+              onClick={() => {
+                window.scrollTo(0, 0);
+                navigate('/dashboard');
+              }}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -311,13 +328,6 @@ const ViewMissing = () => {
                   <Card key={person.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       {renderImage(person)}
-                      {/* Hidden placeholder for failed image loads */}
-                      <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center hidden">
-                        <div className="text-center">
-                          <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                          <p className="text-gray-500 text-sm">Image failed to load</p>
-                        </div>
-                      </div>
                       
                       <div className="space-y-3">
                         <div className="flex justify-between items-start">
@@ -395,7 +405,10 @@ const ViewMissing = () => {
               If you have any information about a missing person, please contact the authorities or the contact person listed.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="secondary" onClick={() => navigate('/report-missing')}>
+              <Button variant="secondary" onClick={() => {
+                window.scrollTo(0, 0);
+                navigate('/report-missing');
+              }}>
                 Report a Missing Person
               </Button>
               <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
