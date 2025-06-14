@@ -14,17 +14,25 @@ import {
   Search,
   Shield,
   Users,
+  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+
+interface SuccessStory {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+}
 
 const Index = () => {
   const navigate = useNavigate();
   const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [successStories, setSuccessStories] = useState([]);
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -90,6 +98,7 @@ const Index = () => {
             <div className="hidden md:flex space-x-8">
               <a href="#home" className="text-gray-700 hover:text-blue-600">Home</a>
               <a href="#search" className="text-gray-700 hover:text-blue-600">Search</a>
+              <a href="#view" className="text-gray-700 hover:text-blue-600">View Missing</a>
               <a href="#resources" className="text-gray-700 hover:text-blue-600">Resources</a>
               <a href="#stories" className="text-gray-700 hover:text-blue-600">Stories</a>
               <a href="#contact" className="text-gray-700 hover:text-blue-600">Contact</a>
@@ -169,8 +178,31 @@ const Index = () => {
         </div>
       </section>
 
+      {/* View Missing Section */}
+      <section id="view" className="py-16 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            View Missing Persons
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Browse through our comprehensive database of missing persons and help us reunite families.
+          </p>
+          <Card className="max-w-md mx-auto">
+            <CardContent className="p-6">
+              <Button 
+                onClick={() => navigate('/view-missing')} 
+                className="w-full flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                View All Missing Persons
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Resources Section - Direct Navigation */}
-      <section id="resources" className="py-16 px-4">
+      <section id="resources" className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Resources & Support
@@ -273,7 +305,7 @@ const Index = () => {
       </section>
 
       {/* Educational Content */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Understanding Communal Unrest
@@ -304,7 +336,7 @@ const Index = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 px-4 bg-white">
+      <section id="contact" className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Contact Us

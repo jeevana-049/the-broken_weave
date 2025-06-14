@@ -15,6 +15,7 @@ import LegalAid from "./pages/LegalAid";
 import EmergencyHelplines from "./pages/EmergencyHelplines";
 import CounsellingServices from "./pages/CounsellingServices";
 import SearchMissing from "./pages/SearchMissing";
+import ViewMissing from "./pages/ViewMissing";
 import NotFound from "./pages/NotFound";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageReports from "./pages/admin/ManageReports";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/report-missing" element={<ReportMissing />} />
           <Route path="/search-missing" element={<SearchMissing />} />
+          <Route path="/view-missing" element={<ViewMissing />} />
           <Route path="/how-to-help" element={<HowToHelp />} />
           <Route path="/legal-aid" element={<LegalAid />} />
           <Route path="/emergency-helplines" element={<EmergencyHelplines />} />

@@ -6,58 +6,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Mail, Phone, MapPin } from "lucide-react";
+import { Heart, ArrowLeft, CreditCard, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createAdminNotification } from "@/utils/notificationService";
 
 const Donate = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsLoading(true);
 
     try {
       const { error } = await supabase
         .from('donations')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            message: formData.message
-          }
-        ]);
+        .insert([formData]);
 
       if (error) throw error;
 
+      // Create admin notification
+      await createAdminNotification({
+        title: 'New Donation Received',
+        message: `${formData.name} (${formData.email}) made a donation`,
+        type: 'donation'
+      });
+
       toast({
-        title: "Message sent successfully!",
-        description: "Thank you for your interest in donating. We'll get back to you soon."
+        title: "Thank you for your donation!",
+        description: "Your support helps us reunite families and rebuild communities."
       });
 
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
-      console.error('Error submitting donation inquiry:', error);
+      console.error('Error submitting donation:', error);
       toast({
         title: "Error",
-        description: "There was an error sending your message. Please try again.",
+        description: "Failed to process donation. Please try again.",
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -70,7 +75,7 @@ const Donate = () => {
               <Heart className="h-8 w-8 text-red-500" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
-                <p className="text-sm text-gray-600">Donate</p>
+                <p className="text-sm text-gray-600">Make a Donation</p>
               </div>
             </div>
             <Button 
@@ -91,95 +96,120 @@ const Donate = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Support Our Mission
           </h2>
-          <p className="text-lg text-gray-600">
-            Your donation helps us reunite families and provide support to those in need.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Your donation helps us reunite families, support vulnerable communities, 
+            and provide essential services to those affected by communal unrest.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Contact Information */}
+          {/* Donation Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Contact Us for Donations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="w-6 h-6" />
+                Donation Details
+              </CardTitle>
               <CardDescription>
-                Get in touch with us to make a donation or learn more about our funding needs.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-blue-500" />
-                <div>
-                  <p className="font-medium">Email</p>
-                  <p className="text-gray-600">donations@brokenweave.org</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-green-500" />
-                <div>
-                  <p className="font-medium">Phone</p>
-                  <p className="text-gray-600">+91-XXXX-XXXX</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-red-500" />
-                <div>
-                  <p className="font-medium">Address</p>
-                  <p className="text-gray-600">123 Hope Street, City, State 12345</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Contact Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Send us a Message</CardTitle>
-              <CardDescription>
-                Have questions about donating? We'd love to hear from you.
+                Your contribution makes a real difference in people's lives.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input 
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
                     id="name"
                     name="name"
-                    placeholder="Your Name"
                     value={formData.name}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input 
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Your Email"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea 
+                  <Label htmlFor="message">Message (Optional)</Label>
+                  <Textarea
                     id="message"
                     name="message"
-                    placeholder="Tell us about your interest in donating..."
-                    rows={4}
                     value={formData.message}
                     onChange={handleInputChange}
+                    placeholder="Share why you're supporting our cause..."
+                    rows={3}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Processing...' : 'Continue to Payment'}
                 </Button>
               </form>
             </CardContent>
           </Card>
+
+          {/* Impact Information */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Impact</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="w-5 h-5 text-blue-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">₹500</h4>
+                      <p className="text-sm text-gray-600">Provides emergency supplies for one family</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="w-5 h-5 text-green-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">₹1,000</h4>
+                      <p className="text-sm text-gray-600">Funds search operations for missing persons</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="w-5 h-5 text-purple-500 mt-1" />
+                    <div>
+                      <h4 className="font-medium">₹2,500</h4>
+                      <p className="text-sm text-gray-600">Supports counseling services for trauma victims</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Ways to Donate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">
+                    <strong>Online:</strong> Secure payment through our website
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Bank Transfer:</strong> Direct transfer to our organization account
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Check:</strong> Mail checks to our registered address
+                  </p>
+                  <p className="text-xs text-gray-500 mt-4">
+                    All donations are tax-deductible under Section 80G of the Income Tax Act.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>

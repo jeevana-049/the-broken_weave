@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen, UserCheck } from "lucide-react";
+import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen, UserCheck, Eye } from "lucide-react";
+import AdminNotifications from "@/components/AdminNotifications";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -58,6 +58,13 @@ const Dashboard = () => {
       icon: AlertTriangle,
       color: "bg-red-500 hover:bg-red-600",
       action: () => isGuest ? handleGuestRestriction() : navigate('/report-missing')
+    },
+    {
+      title: "View Missing",
+      description: "Browse and search missing persons database",
+      icon: Eye,
+      color: "bg-purple-500 hover:bg-purple-600",
+      action: () => navigate('/view-missing')
     }
   ];
 
@@ -120,7 +127,8 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
+              {isAdmin && !isGuest && <AdminNotifications />}
               <Button 
                 variant="outline" 
                 onClick={handleNavigateToHome}
@@ -163,7 +171,7 @@ const Dashboard = () => {
             </Button>
           )}
         </div>
-
+        
         {/* Admin Section */}
         {isAdmin && !isGuest && (
           <div className="mb-16">
@@ -200,7 +208,7 @@ const Dashboard = () => {
         )}
 
         {/* Regular Services */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {dashboardOptions.map((option, index) => {
             const IconComponent = option.icon;
             return (
@@ -218,9 +226,9 @@ const Dashboard = () => {
                   <Button 
                     className="w-full" 
                     onClick={option.action}
-                    disabled={isGuest}
+                    disabled={isGuest && option.title !== "View Missing"}
                   >
-                    {isGuest ? 'Login Required' : 'Get Started'}
+                    {(isGuest && option.title !== "View Missing") ? 'Login Required' : 'Get Started'}
                   </Button>
                 </CardContent>
               </Card>
