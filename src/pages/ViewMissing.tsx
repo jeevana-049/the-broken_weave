@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter } from "lucide-react";
+import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter, AlertTriangle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -397,26 +397,45 @@ const ViewMissing = () => {
           </>
         )}
 
-        {/* Call to Action */}
-        <Card className="mt-12 border border-gray-200 shadow-sm bg-blue-500 text-white">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">Have Information?</h3>
-            <p className="text-blue-100 mb-6">
-              If you have any information about a missing person, please contact the authorities or the contact person listed.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="secondary" onClick={() => {
-                window.scrollTo(0, 0);
-                navigate('/report-missing');
-              }}>
+        {/* Improved Call to Action Section */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Card className="border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50">
+            <CardContent className="p-8 text-center">
+              <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-orange-900 mb-4">Have Information?</h3>
+              <p className="text-orange-800 mb-6">
+                If you have any information about a missing person, please contact the authorities or the contact person listed immediately.
+              </p>
+              <div className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+                >
+                  Emergency: Call 100
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+            <CardContent className="p-8 text-center">
+              <Users className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-blue-900 mb-4">Report Missing Person</h3>
+              <p className="text-blue-800 mb-6">
+                Help us expand our database by reporting missing individuals from your community.
+              </p>
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700" 
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate('/report-missing');
+                }}
+              >
                 Report a Missing Person
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
-                Emergency: Call 100
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );

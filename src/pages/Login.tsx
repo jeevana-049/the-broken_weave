@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { notifyUserLogin, notifyUserRegistration } from "@/utils/notificationService";
@@ -64,7 +64,7 @@ const Login = () => {
         description: `Welcome back, ${data.username}!`
       });
 
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -141,7 +141,7 @@ const Login = () => {
 
   const handleGuestAccess = () => {
     localStorage.setItem('isGuest', 'true');
-    navigate('/dashboard');
+    navigate('/home');
   };
 
   const handleLogout = () => {
@@ -178,8 +178,8 @@ const Login = () => {
                   <p className="text-sm font-medium text-gray-700">Welcome, {currentUser.username}</p>
                   <p className="text-xs text-gray-500">{isAdmin ? 'Administrator' : 'User'}</p>
                 </div>
-                <Button onClick={() => navigate('/dashboard')}>
-                  Dashboard
+                <Button onClick={() => navigate('/home')}>
+                  Home
                 </Button>
                 <Button variant="outline" onClick={handleLogout}>
                   Logout
@@ -196,14 +196,14 @@ const Login = () => {
               Welcome Back!
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              You're already logged in. Use the dashboard to access all features and help reunite families.
+              You're already logged in. Use the home page to access all features and help reunite families.
             </p>
             <Button 
-              onClick={() => navigate('/dashboard')} 
+              onClick={() => navigate('/home')} 
               size="lg" 
               className="mt-6"
             >
-              Go to Dashboard
+              Go to Home
             </Button>
           </div>
         </main>
@@ -245,8 +245,7 @@ const Login = () => {
             Bringing Families Together
           </h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            A comprehensive platform dedicated to reuniting missing persons with their families. 
-            Join our mission to restore hope and rebuild connections across communities.
+            A comprehensive platform dedicated to reuniting missing persons with their families.
           </p>
         </div>
 
