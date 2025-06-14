@@ -83,17 +83,17 @@ const ManageDonations = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-blue-100">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-full">
+              <div className="p-2 bg-red-500 rounded-full">
                 <Heart className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-gray-900">
                   The Broken Weave
                 </h1>
                 <p className="text-sm text-gray-600">Donations Management</p>
@@ -104,7 +104,7 @@ const ManageDonations = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
@@ -117,51 +117,51 @@ const ManageDonations = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Donations Overview
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <Card className="border border-gray-200 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
-                <DollarSign className="h-4 w-4" />
+                <CardTitle className="text-sm font-medium text-gray-700">Total Donations</CardTitle>
+                <DollarSign className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{donations.length}</div>
-                <p className="text-xs text-green-100">Total number of donations</p>
+                <div className="text-2xl font-bold text-gray-900">{donations.length}</div>
+                <p className="text-xs text-gray-500">Total number of donations</p>
               </CardContent>
             </Card>
             
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <Card className="border border-gray-200 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">This Month</CardTitle>
-                <Calendar className="h-4 w-4" />
+                <CardTitle className="text-sm font-medium text-gray-700">This Month</CardTitle>
+                <Calendar className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gray-900">
                   {donations.filter(d => new Date(d.created_at).getMonth() === new Date().getMonth()).length}
                 </div>
-                <p className="text-xs text-blue-100">Donations this month</p>
+                <p className="text-xs text-gray-500">Donations this month</p>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+            <Card className="border border-gray-200 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">With Messages</CardTitle>
-                <MessageCircle className="h-4 w-4" />
+                <CardTitle className="text-sm font-medium text-gray-700">With Messages</CardTitle>
+                <MessageCircle className="h-4 w-4 text-purple-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gray-900">
                   {donations.filter(d => d.message && d.message.trim()).length}
                 </div>
-                <p className="text-xs text-purple-100">Donations with messages</p>
+                <p className="text-xs text-gray-500">Donations with messages</p>
               </CardContent>
             </Card>
           </div>
         </div>
 
         {/* Donations List */}
-        <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm">
+        <Card className="border border-gray-200 shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -177,7 +177,6 @@ const ManageDonations = () => {
                 onClick={fetchDonations} 
                 variant="outline"
                 disabled={isLoading}
-                className="border-blue-200 text-blue-600 hover:bg-blue-50"
               >
                 {isLoading ? 'Refreshing...' : 'Refresh'}
               </Button>
@@ -198,11 +197,11 @@ const ManageDonations = () => {
             ) : (
               <div className="space-y-4">
                 {donations.map((donation) => (
-                  <Card key={donation.id} className="border border-gray-200 hover:shadow-lg transition-shadow">
+                  <Card key={donation.id} className="border border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gradient-to-r from-green-400 to-green-500 rounded-full">
+                          <div className="p-2 bg-green-500 rounded-full">
                             <User className="w-5 h-5 text-white" />
                           </div>
                           <div>
@@ -224,7 +223,7 @@ const ManageDonations = () => {
                       </div>
 
                       {donation.message && donation.message.trim() && (
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 mt-3">
+                        <div className="bg-gray-50 rounded-lg p-3 mt-3">
                           <p className="text-sm text-gray-700 flex items-start gap-2">
                             <MessageCircle className="w-4 h-4 mt-0.5 text-blue-500" />
                             <span className="italic">"{donation.message}"</span>
