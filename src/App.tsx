@@ -14,9 +14,11 @@ import HowToHelp from "./pages/HowToHelp";
 import LegalAid from "./pages/LegalAid";
 import EmergencyHelplines from "./pages/EmergencyHelplines";
 import CounsellingServices from "./pages/CounsellingServices";
+import SearchMissing from "./pages/SearchMissing";
 import NotFound from "./pages/NotFound";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageReports from "./pages/admin/ManageReports";
+import ManageVolunteers from "./pages/admin/ManageVolunteers";
 import SuccessStories from "./pages/admin/SuccessStories";
 import SystemSettings from "./pages/admin/SystemSettings";
 
@@ -35,12 +37,14 @@ const App = () => (
           <Route path="/donate" element={<Donate />} />
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/report-missing" element={<ReportMissing />} />
+          <Route path="/search-missing" element={<SearchMissing />} />
           <Route path="/how-to-help" element={<HowToHelp />} />
           <Route path="/legal-aid" element={<LegalAid />} />
           <Route path="/emergency-helplines" element={<EmergencyHelplines />} />
           <Route path="/counselling-services" element={<CounsellingServices />} />
           <Route path="/admin/users" element={<ManageUsers />} />
           <Route path="/admin/reports" element={<ManageReports />} />
+          <Route path="/admin/volunteers" element={<ManageVolunteers />} />
           <Route path="/admin/success-stories" element={<SuccessStories />} />
           <Route path="/admin/settings" element={<SystemSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

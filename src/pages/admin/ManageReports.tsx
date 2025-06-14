@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, Eye, Edit, CheckCircle, XCircle } from "lucide-react";
+import { Heart, ArrowLeft, Search, Eye, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -167,9 +165,9 @@ const ManageReports = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     {report.is_reunited ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" title="Reunited" />
+                      <CheckCircle className="w-5 h-5 text-green-500" />
                     ) : (
-                      <XCircle className="w-5 h-5 text-red-500" title="Missing" />
+                      <XCircle className="w-5 h-5 text-red-500" />
                     )}
                   </div>
                 </div>
@@ -194,7 +192,7 @@ const ManageReports = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => navigate(`/admin/reports/${report.id}`)}
+                    onClick={() => navigate(`/search-missing?id=${report.id}`)}
                   >
                     <Eye className="w-4 h-4 mr-1" />
                     View

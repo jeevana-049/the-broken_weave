@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen } from "lucide-react";
+import { Heart, HandHeart, Users, AlertTriangle, ArrowLeft, Settings, Database, BookOpen, UserCheck } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -75,6 +75,13 @@ const Dashboard = () => {
       icon: Database,
       color: "bg-indigo-600 hover:bg-indigo-700",
       action: () => navigate('/admin/reports')
+    },
+    {
+      title: "Manage Volunteers",
+      description: "View and manage volunteer registrations",
+      icon: UserCheck,
+      color: "bg-emerald-600 hover:bg-emerald-700",
+      action: () => navigate('/admin/volunteers')
     },
     {
       title: "Success Stories",
@@ -161,7 +168,7 @@ const Dashboard = () => {
         {isAdmin && !isGuest && (
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Administrative Tools</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto mb-12">
               {adminOptions.map((option, index) => {
                 const IconComponent = option.icon;
                 return (

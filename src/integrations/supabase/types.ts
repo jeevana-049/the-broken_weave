@@ -78,6 +78,36 @@ export type Database = {
         }
         Relationships: []
       }
+      search_queries: {
+        Row: {
+          age_range: string | null
+          category: string | null
+          id: number
+          location: string | null
+          search_term: string
+          searched_at: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          age_range?: string | null
+          category?: string | null
+          id?: number
+          location?: string | null
+          search_term: string
+          searched_at?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          age_range?: string | null
+          category?: string | null
+          id?: number
+          location?: string | null
+          search_term?: string
+          searched_at?: string | null
+          user_ip?: string | null
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           created_at: string | null

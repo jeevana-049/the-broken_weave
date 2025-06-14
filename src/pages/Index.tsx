@@ -23,6 +23,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [successStories, setSuccessStories] = useState([]);
 
   useEffect(() => {
@@ -63,7 +64,11 @@ const Index = () => {
   };
 
   const handleSearchClick = () => {
-    navigate('/dashboard');
+    if (searchTerm.trim()) {
+      navigate(`/search-missing?q=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      navigate('/search-missing');
+    }
   };
 
   const handleLogout = () => {
@@ -146,17 +151,13 @@ const Index = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="search-name">Name</Label>
-                  <Input id="search-name" placeholder="Enter name to search" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="search-age">Age Range</Label>
-                    <Input id="search-age" placeholder="e.g., 5-10" />
-                  </div>
-                  <div>
-                    <Label htmlFor="search-location">Last Known Location</Label>
-                    <Input id="search-location" placeholder="City, State" />
-                  </div>
+                  <Input 
+                    id="search-name" 
+                    placeholder="Enter name to search" 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearchClick()}
+                  />
                 </div>
                 <Button className="w-full" onClick={handleSearchClick}>
                   <Search className="w-4 h-4 mr-2" />
