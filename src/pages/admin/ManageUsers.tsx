@@ -54,7 +54,11 @@ const ManageUsers = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      console.log('Fetched users:', data);
       setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -79,13 +83,21 @@ const ManageUsers = () => {
       return;
     }
 
+    console.log(`Toggling admin status for user ${userId} from ${currentStatus} to ${!currentStatus}`);
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('users')
         .update({ is_admin: !currentStatus })
-        .eq('id', userId);
+        .eq('id', userId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
+      
+      console.log('Update result:', data);
       
       const action = !currentStatus ? 'granted' : 'revoked';
       toast({
@@ -93,9 +105,10 @@ const ManageUsers = () => {
         description: `Admin privileges ${action} for ${targetUsername}.`
       });
       
-      fetchUsers();
+      // Refresh the users list to show updated status
+      await fetchUsers();
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error('Error updating user admin status:', error);
       toast({
         title: "Error",
         description: "Failed to update user admin status.",

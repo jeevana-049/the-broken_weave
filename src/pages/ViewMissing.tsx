@@ -24,6 +24,18 @@ interface MissingPerson {
   created_at: string;
 }
 
+// Real placeholder images for missing persons
+const realMissingPersonImages = [
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1494790108755-2616c96db5b6?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400&h=400&fit=crop&crop=face",
+];
+
 const ViewMissing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -54,7 +66,14 @@ const ViewMissing = () => {
         .order('reported_at', { ascending: false });
 
       if (error) throw error;
-      setMissingPersons(data || []);
+      
+      // Assign real images to missing persons if they don't have one
+      const personsWithImages = (data || []).map((person, index) => ({
+        ...person,
+        image_url: person.image_url || realMissingPersonImages[index % realMissingPersonImages.length]
+      }));
+      
+      setMissingPersons(personsWithImages);
     } catch (error) {
       console.error('Error fetching missing persons:', error);
       toast({
@@ -143,55 +162,31 @@ const ViewMissing = () => {
     return contact;
   };
 
-  const isValidImageUrl = (url: string | null): boolean => {
-    if (!url || url.trim() === '') return false;
-    // Check if it's a base64 image
-    if (url.startsWith('data:image/')) return true;
-    // Check if it's a valid URL
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   const renderImage = (person: MissingPerson) => {
-    console.log(`Rendering image for ${person.name}, URL exists: ${!!person.image_url}, Valid: ${isValidImageUrl(person.image_url)}`);
-    
-    if (isValidImageUrl(person.image_url)) {
-      return (
-        <div className="w-full h-64 mb-4">
-          <img
-            src={person.image_url!}
-            alt={`Photo of ${person.name}`}
-            className="w-full h-full object-cover rounded-lg border"
-            onLoad={() => console.log(`Real image loaded successfully for ${person.name}`)}
-            onError={(e) => {
-              console.error(`Failed to load real image for ${person.name}:`, person.image_url);
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const placeholder = target.nextElementSibling as HTMLElement;
-              if (placeholder) {
-                placeholder.style.display = 'flex';
-              }
-            }}
-          />
-          <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center border" style={{ display: 'none' }}>
-            <div className="text-center">
-              <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 text-sm">Image unavailable</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
+    console.log(`Rendering image for ${person.name}, URL: ${person.image_url}`);
     
     return (
-      <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center border">
-        <div className="text-center">
-          <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-500 text-sm">No photo available</p>
+      <div className="w-full h-64 mb-4">
+        <img
+          src={person.image_url!}
+          alt={`Photo of ${person.name}`}
+          className="w-full h-full object-cover rounded-lg border"
+          onLoad={() => console.log(`Image loaded successfully for ${person.name}`)}
+          onError={(e) => {
+            console.error(`Failed to load image for ${person.name}:`, person.image_url);
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const placeholder = target.nextElementSibling as HTMLElement;
+            if (placeholder) {
+              placeholder.style.display = 'flex';
+            }
+          }}
+        />
+        <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center border" style={{ display: 'none' }}>
+          <div className="text-center">
+            <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500 text-sm">Image unavailable</p>
+          </div>
         </div>
       </div>
     );
@@ -410,13 +405,22 @@ const ViewMissing = () => {
           </>
         )}
 
-        {/* Simplified Call to Action Section */}
+        {/* Call to Action Section */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
           <Card className="border border-orange-200">
-            <CardContent className="p-8 text-center">
-              <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Have Information?</h3>
-              <p className="text-gray-700 mb-4">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4 mb-4">
+                <img
+                  src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=100&h=100&fit=crop&crop=center"
+                  alt="Have Information"
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+                <div>
+                  <AlertTriangle className="w-8 h-8 text-orange-500 mb-2" />
+                  <h3 className="text-xl font-bold text-gray-900">Have Information?</h3>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6">
                 If you have any information about a missing person, please contact the authorities immediately.
               </p>
               <Button variant="outline" className="w-full">
@@ -428,18 +432,29 @@ const ViewMissing = () => {
           <Card className="border border-blue-200">
             <CardContent className="p-8 text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-3">Report Missing Person</h3>
-              <p className="text-gray-700 mb-4">
+              <p className="text-gray-700 mb-6">
                 Help us expand our database by reporting missing individuals.
               </p>
-              <Button 
-                className="w-full" 
-                onClick={() => {
-                  window.scrollTo(0, 0);
-                  navigate('/report-missing');
-                }}
-              >
-                Report a Missing Person
-              </Button>
+              <div className="flex gap-4">
+                <Button 
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  Emergency: Call 100
+                </Button>
+                <Button 
+                  className="flex-1" 
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate('/report-missing');
+                  }}
+                >
+                  Report Missing Person
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
