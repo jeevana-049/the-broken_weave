@@ -99,14 +99,28 @@ const ManageUsers = () => {
       
       console.log('Update result:', data);
       
+      // Update the local state immediately
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId 
+            ? { ...user, is_admin: !currentStatus }
+            : user
+        )
+      );
+
+      // Update current user if they were modified
+      if (currentUser && currentUser.id === userId) {
+        const updatedUser = { ...currentUser, is_admin: !currentStatus };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+      
       const action = !currentStatus ? 'granted' : 'revoked';
       toast({
         title: "Success!",
         description: `Admin privileges ${action} for ${targetUsername}.`
       });
       
-      // Refresh the users list to show updated status
-      await fetchUsers();
     } catch (error) {
       console.error('Error updating user admin status:', error);
       toast({

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,16 +23,20 @@ interface MissingPerson {
   created_at: string;
 }
 
-// Real placeholder images for missing persons
+// Real images for missing persons from Unsplash
 const realMissingPersonImages = [
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1494790108755-2616c96db5b6?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=400&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1494790108755-2616c96db5b6?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=400&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1463453091185-61582044d556?w=300&h=400&fit=crop&crop=face"
 ];
 
 const ViewMissing = () => {
@@ -67,10 +70,10 @@ const ViewMissing = () => {
 
       if (error) throw error;
       
-      // Assign real images to missing persons if they don't have one
+      // Assign real images to missing persons
       const personsWithImages = (data || []).map((person, index) => ({
         ...person,
-        image_url: person.image_url || realMissingPersonImages[index % realMissingPersonImages.length]
+        image_url: realMissingPersonImages[index % realMissingPersonImages.length]
       }));
       
       setMissingPersons(personsWithImages);
@@ -163,15 +166,12 @@ const ViewMissing = () => {
   };
 
   const renderImage = (person: MissingPerson) => {
-    console.log(`Rendering image for ${person.name}, URL: ${person.image_url}`);
-    
     return (
       <div className="w-full h-64 mb-4">
         <img
           src={person.image_url!}
           alt={`Photo of ${person.name}`}
           className="w-full h-full object-cover rounded-lg border"
-          onLoad={() => console.log(`Image loaded successfully for ${person.name}`)}
           onError={(e) => {
             console.error(`Failed to load image for ${person.name}:`, person.image_url);
             const target = e.target as HTMLImageElement;
@@ -410,15 +410,8 @@ const ViewMissing = () => {
           <Card className="border border-orange-200">
             <CardContent className="p-8">
               <div className="flex items-center gap-4 mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=100&h=100&fit=crop&crop=center"
-                  alt="Have Information"
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-                <div>
-                  <AlertTriangle className="w-8 h-8 text-orange-500 mb-2" />
-                  <h3 className="text-xl font-bold text-gray-900">Have Information?</h3>
-                </div>
+                <AlertTriangle className="w-8 h-8 text-orange-500" />
+                <h3 className="text-xl font-bold text-gray-900">Have Information?</h3>
               </div>
               <p className="text-gray-700 mb-6">
                 If you have any information about a missing person, please contact the authorities immediately.
@@ -430,31 +423,23 @@ const ViewMissing = () => {
           </Card>
           
           <Card className="border border-blue-200">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Report Missing Person</h3>
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4 mb-4">
+                <Heart className="w-8 h-8 text-red-500" />
+                <h3 className="text-xl font-bold text-gray-900">Report Missing Person</h3>
+              </div>
               <p className="text-gray-700 mb-6">
                 Help us expand our database by reporting missing individuals.
               </p>
-              <div className="flex gap-4">
-                <Button 
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  Emergency: Call 100
-                </Button>
-                <Button 
-                  className="flex-1" 
-                  onClick={() => {
-                    window.scrollTo(0, 0);
-                    navigate('/report-missing');
-                  }}
-                >
-                  Report Missing Person
-                </Button>
-              </div>
+              <Button 
+                className="w-full" 
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate('/report-missing');
+                }}
+              >
+                Report Missing Person
+              </Button>
             </CardContent>
           </Card>
         </div>
