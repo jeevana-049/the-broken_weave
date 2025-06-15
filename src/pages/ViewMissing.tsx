@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter, AlertTriangle, Users } from "lucide-react";
+import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -143,19 +143,32 @@ const ViewMissing = () => {
     return contact;
   };
 
+  const isValidImageUrl = (url: string | null): boolean => {
+    if (!url || url.trim() === '') return false;
+    // Check if it's a base64 image
+    if (url.startsWith('data:image/')) return true;
+    // Check if it's a valid URL
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const renderImage = (person: MissingPerson) => {
-    console.log(`Rendering image for ${person.name}, URL: ${person.image_url}`);
+    console.log(`Rendering image for ${person.name}, URL exists: ${!!person.image_url}, Valid: ${isValidImageUrl(person.image_url)}`);
     
-    if (person.image_url && person.image_url.trim() !== '') {
+    if (isValidImageUrl(person.image_url)) {
       return (
         <div className="w-full h-64 mb-4">
           <img
-            src={person.image_url}
+            src={person.image_url!}
             alt={`Photo of ${person.name}`}
-            className="w-full h-full object-cover rounded-lg"
-            onLoad={() => console.log(`Image loaded successfully for ${person.name}`)}
+            className="w-full h-full object-cover rounded-lg border"
+            onLoad={() => console.log(`Real image loaded successfully for ${person.name}`)}
             onError={(e) => {
-              console.error(`Failed to load image for ${person.name}:`, person.image_url);
+              console.error(`Failed to load real image for ${person.name}:`, person.image_url);
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
               const placeholder = target.nextElementSibling as HTMLElement;
@@ -164,10 +177,10 @@ const ViewMissing = () => {
               }
             }}
           />
-          <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
+          <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center border" style={{ display: 'none' }}>
             <div className="text-center">
               <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 text-sm">Image failed to load</p>
+              <p className="text-gray-500 text-sm">Image unavailable</p>
             </div>
           </div>
         </div>
@@ -175,7 +188,7 @@ const ViewMissing = () => {
     }
     
     return (
-      <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+      <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center border">
         <div className="text-center">
           <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
           <p className="text-gray-500 text-sm">No photo available</p>
@@ -397,35 +410,29 @@ const ViewMissing = () => {
           </>
         )}
 
-        {/* Improved Call to Action Section */}
+        {/* Simplified Call to Action Section */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50">
+          <Card className="border border-orange-200">
             <CardContent className="p-8 text-center">
-              <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-orange-900 mb-4">Have Information?</h3>
-              <p className="text-orange-800 mb-6">
-                If you have any information about a missing person, please contact the authorities or the contact person listed immediately.
+              <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Have Information?</h3>
+              <p className="text-gray-700 mb-4">
+                If you have any information about a missing person, please contact the authorities immediately.
               </p>
-              <div className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
-                >
-                  Emergency: Call 100
-                </Button>
-              </div>
+              <Button variant="outline" className="w-full">
+                Emergency: Call 100
+              </Button>
             </CardContent>
           </Card>
           
-          <Card className="border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <Card className="border border-blue-200">
             <CardContent className="p-8 text-center">
-              <Users className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-blue-900 mb-4">Report Missing Person</h3>
-              <p className="text-blue-800 mb-6">
-                Help us expand our database by reporting missing individuals from your community.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Report Missing Person</h3>
+              <p className="text-gray-700 mb-4">
+                Help us expand our database by reporting missing individuals.
               </p>
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700" 
+                className="w-full" 
                 onClick={() => {
                   window.scrollTo(0, 0);
                   navigate('/report-missing');

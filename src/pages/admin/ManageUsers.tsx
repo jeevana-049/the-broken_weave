@@ -4,17 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, UserCheck, UserX, Shield } from "lucide-react";
+import { Heart, ArrowLeft, Search, UserCheck, UserX, Shield, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNotifications from "@/components/AdminNotifications";
 
+interface User {
+  id: number;
+  username: string;
+  email: string | null;
+  is_admin: boolean;
+  created_at: string;
+}
+
 const ManageUsers = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,6 +39,7 @@ const ManageUsers = () => {
     }
     
     const user = JSON.parse(userData);
+    setCurrentUser(user);
     if (!user.is_admin) {
       navigate('/dashboard');
       return;
@@ -58,7 +68,17 @@ const ManageUsers = () => {
     }
   };
 
-  const toggleAdminStatus = async (userId, currentStatus) => {
+  const toggleAdminStatus = async (userId: number, currentStatus: boolean, targetUsername: string) => {
+    // Prevent self-demotion
+    if (currentUser && currentUser.id === userId && currentStatus) {
+      toast({
+        title: "Action Not Allowed",
+        description: "You cannot remove your own admin privileges.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('users')
@@ -67,9 +87,10 @@ const ManageUsers = () => {
 
       if (error) throw error;
       
+      const action = !currentStatus ? 'granted' : 'revoked';
       toast({
         title: "Success!",
-        description: `User admin status ${!currentStatus ? 'granted' : 'revoked'}.`
+        description: `Admin privileges ${action} for ${targetUsername}.`
       });
       
       fetchUsers();
@@ -77,7 +98,7 @@ const ManageUsers = () => {
       console.error('Error updating user:', error);
       toast({
         title: "Error",
-        description: "Failed to update user status.",
+        description: "Failed to update user admin status.",
         variant: "destructive"
       });
     }
@@ -139,16 +160,32 @@ const ManageUsers = () => {
           </div>
         </div>
 
+        {/* Admin Info Card */}
+        <Card className="mb-6 bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-blue-700">
+              <Crown className="w-5 h-5" />
+              <p className="font-medium">Admin Management</p>
+            </div>
+            <p className="text-sm text-blue-600 mt-1">
+              You can directly grant or revoke admin privileges. Changes take effect immediately.
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Users List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers.map((user) => (
-            <Card key={user.id} className="hover:shadow-lg transition-shadow border">
+            <Card key={user.id} className={`hover:shadow-lg transition-shadow border ${user.is_admin ? 'border-blue-200 bg-blue-50' : ''}`}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg flex items-center gap-2">
                       {user.username}
                       {user.is_admin && <Shield className="w-4 h-4 text-blue-500" />}
+                      {currentUser && currentUser.id === user.id && (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">You</span>
+                      )}
                     </CardTitle>
                     <CardDescription>{user.email || 'No email'}</CardDescription>
                   </div>
@@ -164,8 +201,9 @@ const ManageUsers = () => {
                   <Button
                     size="sm"
                     variant={user.is_admin ? "destructive" : "default"}
-                    onClick={() => toggleAdminStatus(user.id, user.is_admin)}
+                    onClick={() => toggleAdminStatus(user.id, user.is_admin, user.username)}
                     className="w-full"
+                    disabled={currentUser && currentUser.id === user.id && user.is_admin}
                   >
                     {user.is_admin ? (
                       <>
@@ -179,6 +217,11 @@ const ManageUsers = () => {
                       </>
                     )}
                   </Button>
+                  {currentUser && currentUser.id === user.id && user.is_admin && (
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      Cannot remove own admin privileges
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
