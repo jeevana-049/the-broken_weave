@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, User, MapPin, Calendar } from "lucide-react";
+import { Heart, ArrowLeft, Search, User, MapPin, Calendar, Phone, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+interface MissingPerson {
+  id: number;
+  name: string;
+  dob: string | null;
+  category: string;
+  last_known_location: string | null;
+  contact_info: string | null;
+  description: string | null;
+  image_url: string | null;
+  status: string;
+  is_reunited: boolean;
+  reported_at: string;
+  created_at: string;
+}
 
 const SearchMissing = () => {
   const navigate = useNavigate();
@@ -17,8 +31,9 @@ const SearchMissing = () => {
   const [ageRange, setAgeRange] = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('all');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<MissingPerson[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<MissingPerson | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -32,6 +47,7 @@ const SearchMissing = () => {
       const { data, error } = await supabase
         .from('missing_persons')
         .select('*')
+        .eq('is_reunited', false)
         .order('reported_at', { ascending: false });
 
       if (error) throw error;
@@ -63,7 +79,7 @@ const SearchMissing = () => {
         });
 
       // Build the search query
-      let query = supabase.from('missing_persons').select('*');
+      let query = supabase.from('missing_persons').select('*').eq('is_reunited', false);
 
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
@@ -116,10 +132,188 @@ const SearchMissing = () => {
     }
   };
 
-  const calculateAge = (dob) => {
+  const calculateAge = (dob: string | null) => {
     if (!dob) return 'Unknown';
     return new Date().getFullYear() - new Date(dob).getFullYear();
   };
+
+  const formatContactInfo = (contactInfo: string | null) => {
+    if (!contactInfo) return null;
+    
+    const parts = contactInfo.split(', ');
+    const contact = {
+      name: '',
+      phone: '',
+      email: ''
+    };
+    
+    parts.forEach(part => {
+      if (part.startsWith('Name: ')) contact.name = part.replace('Name: ', '');
+      if (part.startsWith('Phone: ')) contact.phone = part.replace('Phone: ', '');
+      if (part.startsWith('Email: ')) contact.email = part.replace('Email: ', '');
+    });
+    
+    return contact;
+  };
+
+  const showPersonDetails = (person: MissingPerson) => {
+    setSelectedPerson(person);
+  };
+
+  const closePersonDetails = () => {
+    setSelectedPerson(null);
+  };
+
+  if (selectedPerson) {
+    const contact = formatContactInfo(selectedPerson.contact_info);
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-6">
+              <div className="flex items-center gap-3">
+                <Heart className="h-8 w-8 text-red-500" />
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">The Broken Weave</h1>
+                  <p className="text-sm text-gray-600">Person Details</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={closePersonDetails}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Search
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/home')}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Home
+                </Button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Person Details */}
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <Card className="shadow-lg">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Image Section */}
+                <div>
+                  {selectedPerson.image_url ? (
+                    <img
+                      src={selectedPerson.image_url}
+                      alt={`Photo of ${selectedPerson.name}`}
+                      className="w-full h-96 object-cover rounded-lg border"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center border">
+                      <div className="text-center">
+                        <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">No image available</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Details Section */}
+                <div className="space-y-6">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{selectedPerson.name}</h1>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full font-medium capitalize">
+                        {selectedPerson.category}
+                      </span>
+                      <span className={`px-3 py-1 text-sm rounded-full font-medium ${
+                        selectedPerson.status === 'found' ? 'bg-green-100 text-green-800' :
+                        selectedPerson.status === 'investigating' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedPerson.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {selectedPerson.dob && (
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <p className="font-medium text-gray-700">Age</p>
+                          <p className="text-gray-600">{calculateAge(selectedPerson.dob)} years old</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedPerson.last_known_location && (
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <p className="font-medium text-gray-700">Last Known Location</p>
+                          <p className="text-gray-600">{selectedPerson.last_known_location}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="font-medium text-gray-700 mb-2">Reported</p>
+                      <p className="text-gray-600">{new Date(selectedPerson.reported_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  {selectedPerson.description && (
+                    <div>
+                      <p className="font-medium text-gray-700 mb-2">Description</p>
+                      <p className="text-gray-600 leading-relaxed">{selectedPerson.description}</p>
+                    </div>
+                  )}
+
+                  {contact && (
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <p className="font-medium text-gray-700 mb-3">Contact Information</p>
+                      <div className="space-y-2">
+                        {contact.name && (
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-blue-500" />
+                            <span className="text-gray-600">{contact.name}</span>
+                          </div>
+                        )}
+                        {contact.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="w-4 h-4 text-blue-500" />
+                            <span className="text-gray-600">{contact.phone}</span>
+                          </div>
+                        )}
+                        {contact.email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-blue-500" />
+                            <span className="text-gray-600">{contact.email}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -198,8 +392,8 @@ const SearchMissing = () => {
                     <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="child">Child</SelectItem>
                     <SelectItem value="woman">Woman</SelectItem>
-                    <SelectItem value="senior">Senior Citizen</SelectItem>
-                    <SelectItem value="unknown">Unknown</SelectItem>
+                    <SelectItem value="senior-citizen">Senior Citizen</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -226,7 +420,7 @@ const SearchMissing = () => {
         {/* Results Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {searchResults.map((person) => (
-            <Card key={person.id} className="hover:shadow-lg transition-shadow">
+            <Card key={person.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => showPersonDetails(person)}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -254,6 +448,10 @@ const SearchMissing = () => {
                       src={person.image_url} 
                       alt={person.name}
                       className="w-full h-48 object-cover rounded-md"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                     />
                   </div>
                 )}
@@ -267,17 +465,19 @@ const SearchMissing = () => {
                     <Calendar className="w-4 h-4" />
                     <span><strong>Reported:</strong> {new Date(person.reported_at).toLocaleDateString()}</span>
                   </div>
-                  {person.contact_info && (
-                    <p><strong>Contact:</strong> {person.contact_info}</p>
-                  )}
                 </div>
                 
                 {person.description && (
                   <div className="mt-3">
-                    <p className="text-sm text-gray-700"><strong>Description:</strong></p>
-                    <p className="text-sm text-gray-600 mt-1">{person.description}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">{person.description}</p>
                   </div>
                 )}
+                
+                <div className="mt-3">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Details
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

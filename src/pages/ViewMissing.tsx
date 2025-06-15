@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter, AlertTriangle } from "lucide-react";
+import { Heart, ArrowLeft, Search, MapPin, Calendar, User, Phone, Mail, Eye, Filter, AlertTriangle, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,22 +22,6 @@ interface MissingPerson {
   reported_at: string;
   created_at: string;
 }
-
-// Real images for missing persons from Unsplash
-const realMissingPersonImages = [
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1494790108755-2616c96db5b6?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=400&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1463453091185-61582044d556?w=300&h=400&fit=crop&crop=face"
-];
 
 const ViewMissing = () => {
   const navigate = useNavigate();
@@ -70,13 +54,7 @@ const ViewMissing = () => {
 
       if (error) throw error;
       
-      // Assign real images to missing persons
-      const personsWithImages = (data || []).map((person, index) => ({
-        ...person,
-        image_url: realMissingPersonImages[index % realMissingPersonImages.length]
-      }));
-      
-      setMissingPersons(personsWithImages);
+      setMissingPersons(data || []);
     } catch (error) {
       console.error('Error fetching missing persons:', error);
       toast({
@@ -134,6 +112,10 @@ const ViewMissing = () => {
     filterPersons();
   };
 
+  const handleEmergencyCall = () => {
+    window.location.href = 'tel:100';
+  };
+
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -166,28 +148,22 @@ const ViewMissing = () => {
   };
 
   const renderImage = (person: MissingPerson) => {
+    if (!person.image_url) {
+      return null;
+    }
+
     return (
       <div className="w-full h-64 mb-4">
         <img
-          src={person.image_url!}
+          src={person.image_url}
           alt={`Photo of ${person.name}`}
           className="w-full h-full object-cover rounded-lg border"
           onError={(e) => {
             console.error(`Failed to load image for ${person.name}:`, person.image_url);
             const target = e.target as HTMLImageElement;
             target.style.display = 'none';
-            const placeholder = target.nextElementSibling as HTMLElement;
-            if (placeholder) {
-              placeholder.style.display = 'flex';
-            }
           }}
         />
-        <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center border" style={{ display: 'none' }}>
-          <div className="text-center">
-            <User className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">Image unavailable</p>
-          </div>
-        </div>
       </div>
     );
   };
@@ -416,7 +392,11 @@ const ViewMissing = () => {
               <p className="text-gray-700 mb-6">
                 If you have any information about a missing person, please contact the authorities immediately.
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleEmergencyCall}
+              >
                 Emergency: Call 100
               </Button>
             </CardContent>
@@ -425,7 +405,7 @@ const ViewMissing = () => {
           <Card className="border border-blue-200">
             <CardContent className="p-8">
               <div className="flex items-center gap-4 mb-4">
-                <Heart className="w-8 h-8 text-red-500" />
+                <FileText className="w-8 h-8 text-blue-500" />
                 <h3 className="text-xl font-bold text-gray-900">Report Missing Person</h3>
               </div>
               <p className="text-gray-700 mb-6">
